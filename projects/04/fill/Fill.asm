@@ -36,16 +36,16 @@
     
     @key
     D=M
-    @BLACK
+    @WHITE
     D;JEQ
     
-(WHITE)
+(BLACK)
     @color
     M=-1
     @DRAW
     0;JMP
 
-(BLACK)
+(WHITE)
     @color
     M=0
     

@@ -37,7 +37,7 @@ class Parser:
   def removeComments(self):
     for line in self.input:
       newline = re.sub("//.*?\n", "", line) # remove comments
-      newline = re.sub("\\n", "", newline) # remove em
+      newline = re.sub("\\n", "", newline) # remove empty lines
       newline = re.sub("\s", "", newline) # remove spaces
       if newline != "":
         self.lines.insert(len(self.lines), newline)
@@ -63,9 +63,6 @@ class Parser:
       reference = re.search("@R\d+", line)
       if reference != None:
         addr = reference.group().split("@")
-        # if addr[1] not in self.symbolTable:
-          # self.symbolTable[addr[1]] = str(self.symbolIdx)
-          # self.symbolIdx += 1
         self.lines[idx] = "@" + self.symbolTable[addr[1]]
       variable = re.search("@\D.*", line)
       if variable != None:
