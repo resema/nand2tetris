@@ -119,7 +119,6 @@ class CodeWriter:
     code += "A=M+D" + "\n"  # M=RAM[LCL+offset]
     return code
   
-  
   def accessSpecialAddr(self, segment, index):
     code = "@" + str(index) + "\n"
     code += "D=A" + "\n"  # D=pointer offset (index)
