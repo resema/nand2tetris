@@ -119,29 +119,6 @@ class CodeWriter:
     code += "A=M+D" + "\n"  # M=RAM[LCL+offset]
     return code
   
-  # # access temp address
-  # def accessTempAddr(self, index):
-    # code = "@" + str(index) + "\n"
-    # code += "D=A" + "\n"  # D=pointer offset (index)
-    # code += "@R5" + "\n"
-    # code += "A=A+D" + "\n"  # M=RAM[R5+offset]
-    # return code
-    
-  # # access static address
-  # def accessStaticAddr(self, index):
-    # code = "@" + str(index) + "\n"
-    # code += "D=A" + "\n"  # D=pointer offset (index)
-    # code += "@16" + "\n"
-    # code += "A=A+D" + "\n"  # M=RAM[R5+offset]
-    # return code
-  
-  # # access pointer 1 or 2 address
-  # def accessPointerAddr(self, index):
-    # code = "@" + str(index) + "\n"
-    # code += "D=A" + "\n"  # D=pointer offset (index)
-    # code += "@3" + "\n"
-    # code += "A=A+D" + "\n"  # M=RAM[R5+offset]
-    # return code
   
   def accessSpecialAddr(self, segment, index):
     code = "@" + str(index) + "\n"
@@ -149,7 +126,7 @@ class CodeWriter:
     code += "@" + self.segments[segment] + "\n"
     code += "A=A+D" + "\n"  # M=RAM[R5+offset]
     return code
-  
+   
   # writes to the output file the assembly code that implements the given cmd
   def writeArithmetic(self, command):
     code = ""
