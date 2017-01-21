@@ -4,37 +4,41 @@ import os
 
 class Parser:
 
-  def __init__(self, input):
-    self.inFile = input
+  def __init__(self, fileName):
     self.rawCmds = []
     self.curCmd = ""
     self.cmd = []
     self.typeCmd = { "add": "C_ARITHMETIC",
-                              "sub": "C_ARITHMETIC",
-                              "neg": "C_ARITHMETIC",
-                              "eq"  : "C_ARITHMETIC",
-                              "gt"  : "C_ARITHMETIC",
-                              "lt"   : "C_ARITHMETIC",
-                              "and": "C_ARITHMETIC",
-                              "or" : "C_ARITHMETIC",
-                              "not": "C_ARITHMETIC",
-                              "push": "C_PUSH",
-                              "pop": "C_POP",
-                              "label": "C_LABEL",
-                              "goto": "C_GOTO",
-                              "if"   : "C_IF",
-                              "function": "C_FUNCTION",
-                              "return": "C_RETURN",
-                              "call" : "C_CALL"
-                             }
+                      "sub": "C_ARITHMETIC",
+                      "neg": "C_ARITHMETIC",
+                      "eq"  : "C_ARITHMETIC",
+                      "gt"  : "C_ARITHMETIC",
+                      "lt"   : "C_ARITHMETIC",
+                      "and": "C_ARITHMETIC",
+                      "or" : "C_ARITHMETIC",
+                      "not": "C_ARITHMETIC",
+                      "push": "C_PUSH",
+                      "pop": "C_POP",
+                      "label": "C_LABEL",
+                      "goto": "C_GOTO",
+                      "if"   : "C_IF",
+                      "function": "C_FUNCTION",
+                      "return": "C_RETURN",
+                      "call" : "C_CALL"
+                      }
+                      
+    # open input file
+    self.fobj_in = open(fileName)
     
-    for line in self.inFile:
+    for line in self.fobj_in:
       newline = re.sub("//.*?\n", "", line) # remove comments
       newline = re.sub("\\n", "", newline) # remove empty lines
       if newline != "":
         self.rawCmds.insert(len(self.rawCmds), newline)
-        
-  
+
+  def close(self):
+      self.fobj_in.close()
+    
   # are there more commands in the input
   def hasMoreCommands(self):
     return len(self.rawCmds) > 0
@@ -62,46 +66,246 @@ class Parser:
   def arg2(self):
     return self.cmd[2]
     
-  def debug(self):
-    print(self.curCmd)
-  
-  
 class CodeWriter:
   
-  def __init__(self, output):
-    self.outFile = output
+  def __init__(self):
+    self.fobj_out = ""
+    self.lableCnt = 0
+    self.varCnt = 0
+    self.segments = { "local": "LCL",
+                             "argument": "ARG",
+                             "this": "THIS",
+                             "that": "THAT",
+                             "temp": "R5",
+                             "static": "16",
+                             "pointer": "3"
+                             }
+    
+  def setFileName(self, fileName):
+    self.fobj_out = open(fileName, 'w')
+    
+  def close(self):
+    self.fobj_out.close()
+    
+  # helper to increase SP
+  def increaseSP(self):
+    code = ""
+    code = "@SP" + "\n"
+    code += "M=M+1" + "\n"
+    return code
+  
+  # decrease sp and access the pointee
+  def decreaseAndAccessSP(self):
+    code = ""
+    code = "@SP" + "\n"
+    code += "M=M-1" + "\n" 
+    code += "A=M" + "\n"
+    return code
+    
+  #push value in D to SP
+  def pushDtoSP(self):
+    code = ""
+    code = "@SP" + "\n" 
+    code += "A=M" + "\n" 
+    code += "M=D" + "\n"
+    return code
+    
+  # access the specified segment address
+  def accessSegmentAddr(self, segment, index):
+    code = ""
+    code = "@" + str(index) + "\n"
+    code += "D=A" + "\n"  # D=pointer offset (index)
+    code += "@" + self.segments[segment] + "\n"
+    code += "A=M+D" + "\n"  # M=RAM[LCL+offset]
+    return code
+  
+  # # access temp address
+  # def accessTempAddr(self, index):
+    # code = "@" + str(index) + "\n"
+    # code += "D=A" + "\n"  # D=pointer offset (index)
+    # code += "@R5" + "\n"
+    # code += "A=A+D" + "\n"  # M=RAM[R5+offset]
+    # return code
+    
+  # # access static address
+  # def accessStaticAddr(self, index):
+    # code = "@" + str(index) + "\n"
+    # code += "D=A" + "\n"  # D=pointer offset (index)
+    # code += "@16" + "\n"
+    # code += "A=A+D" + "\n"  # M=RAM[R5+offset]
+    # return code
+  
+  # # access pointer 1 or 2 address
+  # def accessPointerAddr(self, index):
+    # code = "@" + str(index) + "\n"
+    # code += "D=A" + "\n"  # D=pointer offset (index)
+    # code += "@3" + "\n"
+    # code += "A=A+D" + "\n"  # M=RAM[R5+offset]
+    # return code
+  
+  def accessSpecialAddr(self, segment, index):
+    code = "@" + str(index) + "\n"
+    code += "D=A" + "\n"  # D=pointer offset (index)
+    code += "@" + self.segments[segment] + "\n"
+    code += "A=A+D" + "\n"  # M=RAM[R5+offset]
+    return code
   
   # writes to the output file the assembly code that implements the given cmd
-  def writeArithmetic(self):
-    pass
-  
+  def writeArithmetic(self, command):
+    code = ""
+    if command == "add":
+      code = "// add" + "\n"
+      code += self.decreaseAndAccessSP()
+      code += "D=M" + "\n"  #D=y
+      code += self.decreaseAndAccessSP()  #M=x
+      code += "M=M+D" + "\n"
+      code += self.increaseSP()
+    elif command == "sub":
+      code = "// sub" + "\n"
+      code += self.decreaseAndAccessSP()
+      code += "D=M" + "\n"  #D=y
+      code += self.decreaseAndAccessSP()  #M=x
+      code += "M=M-D" + "\n"
+      code += self.increaseSP()
+    elif command == "eq":
+      code = "// eq" + "\n"
+      code += self.decreaseAndAccessSP()
+      code +="D=M" + "\n"   #D=y
+      code += self.decreaseAndAccessSP()  #M=x
+      code += "D=M-D" + "\n"
+      code += "M=-1" + "\n"  #x=-1 (true)
+      code += "@EQUAL"+ str(self.lableCnt)  + "\n"
+      code += "D;JEQ" + "\n"    #x=y -> equal @SP = -1 (true)
+      code += "@SP" + "\n"
+      code += "A=M" + "\n"
+      code += "M=0" + "\n"  # x!=y -> not equal @SP = 0 (false)
+      code += "(EQUAL" + str(self.lableCnt) + ")" + "\n"
+      code += self.increaseSP()
+      self.lableCnt += 1
+    elif command == "lt":
+      code = "// lt" + "\n"
+      code += self.decreaseAndAccessSP()
+      code +="D=M" + "\n"   #D=y
+      code += self.decreaseAndAccessSP()  #M=x
+      code += "D=M-D" + "\n"
+      code += "M=-1" + "\n"  #x=-1 (true)
+      code += "@LESS"+ str(self.lableCnt)  + "\n"
+      code += "D;JLT" + "\n"    #x<y -> equal @SP = -1 (true)
+      code += "@SP" + "\n"
+      code += "A=M" + "\n"
+      code += "M=0" + "\n"  # x!=y -> not equal @SP = 0 (false)
+      code += "(LESS" + str(self.lableCnt) + ")" + "\n"
+      code += self.increaseSP()
+      self.lableCnt += 1
+    elif command == "gt":
+      code = "// gt" + "\n"
+      code += self.decreaseAndAccessSP()
+      code +="D=M" + "\n"   #D=y
+      code += self.decreaseAndAccessSP()  #M=x
+      code += "D=M-D" + "\n"
+      code += "M=-1" + "\n"  #x=-1 (true)
+      code += "@GREATER"+ str(self.lableCnt)  + "\n"
+      code += "D;JGT" + "\n"    #x<y -> equal @SP = -1 (true)
+      code += "@SP" + "\n"
+      code += "A=M" + "\n"
+      code += "M=0" + "\n"  # x!=y -> not equal @SP = 0 (false)
+      code += "(GREATER" + str(self.lableCnt) + ")" + "\n"
+      code += self.increaseSP()
+      self.lableCnt += 1
+    elif command == "neg":
+      code = "// neg" + "\n"
+      code += self.decreaseAndAccessSP()
+      code += "M=-M" + "\n"
+      code += self.increaseSP()
+    elif command == "and":
+      code = "// and" + "\n"
+      code += self.decreaseAndAccessSP()
+      code += "D=M" + "\n"  #D=y
+      code += self.decreaseAndAccessSP()  #M=x
+      code += "M=D&M" +"\n"
+      code += self.increaseSP()
+    elif command == "or":
+      code = "// and" + "\n"
+      code += self.decreaseAndAccessSP()
+      code += "D=M" + "\n"  #D=y
+      code += self.decreaseAndAccessSP()  #M=x
+      code += "M=D|M" + "\n"
+      code += self.increaseSP()
+    elif command == "not":
+      code = "// neg" + "\n"
+      code += self.decreaseAndAccessSP()
+      code += "M=!M" + "\n"
+      code += self.increaseSP()
+      
+    self.fobj_out.write(code + "\n")
+    
+    
   # write to the output file the assembly code the given command
-  def writePushPop(self):
-    pass
+  def writePushPop(self, command, segment, index):
+    code = ""
+    if command == "C_PUSH":
+      if segment == "constant":
+        code = "// push constant " + str(index) + "\n"
+        code += "@" + index + "\n" 
+        code += "D=A" + "\n" 
+        code += self.pushDtoSP()
+        code += self.increaseSP()
+      elif segment == "temp" or segment == "static" or segment == "pointer":
+        code = "// push " + segment + " " + str(index) + "\n"
+        code += self.accessSpecialAddr(segment, index)
+        code += "D=M" + "\n" # D= RAM[R5+offset]
+        code += self.pushDtoSP()
+        code += self.increaseSP()   
+      else:
+        code = "// push " + segment + " " + str(index) + "\n"
+        code += self.accessSegmentAddr(segment, index)
+        code += "D=M" + "\n" #D = RAM[LCL+offset]
+        code += self.pushDtoSP()
+        code += self.increaseSP()      
+    elif command == "C_POP":
+      code = "// pop " + segment + " " + str(index) + "\n"
+      if segment == "temp" or segment == "static" or segment == "pointer":
+        code += self.accessSpecialAddr(segment, index)
+      else:
+        # get the RAM[seg+index]
+        code += self.accessSegmentAddr(segment, index)      
+      code += "D=A" + "\n" #D = add(RAM[LCL+offset])
+      code += "@R13" + "\n"
+      code += "M=D" + "\n"  # var n stores the address to the segment      
+      code += self.decreaseAndAccessSP()
+      code += "D=M" + "\n"  # D=top of stack
+      code += "@R13" + "\n"
+      code += "A=M" + "\n"
+      code += "M=D" + "\n"
+    # write assembler code to file
+    self.fobj_out.write(code + "\n")
 
-
+    
+# ******************
+# MAIN
+# ******************
 if __name__ == "__main__":
   # parse command line arguments
   parser = argparse.ArgumentParser()
   parser.add_argument("input",  help="input file")
   args = parser.parse_args()
+  fileName = os.path.splitext(args.input )[0] + ".asm"
   
-  # open input and output file
-  fobj_in = open(args.input)
+  # initialize parser and codewriter
+  parser = Parser(args.input)
+  codeWriter = CodeWriter()
+  codeWriter.setFileName(fileName)
   
-  outname = fobj_in.name
-  base = os.path.splitext(outname)[0]
-  fobj_out = open(base + ".asm", 'w')
-
-  parser = Parser(fobj_in)
   while parser.hasMoreCommands():
     parser.advance()
-    type = parser.commandType()
-    arg1 = parser.arg1()
+    cmd = parser.commandType()
+    
+    if cmd == "C_PUSH" or cmd == "C_POP":
+      codeWriter.writePushPop(cmd, parser.arg1(), parser.arg2())
+    elif cmd == "C_ARITHMETIC":
+      codeWriter.writeArithmetic(parser.arg1())
 
-    print(type + " " + arg1)
-    #parser.debug()
-  
+    
   # close input and output file
-  fobj_in.close()
-  fobj_out.close()
+  parser.close()
+  codeWriter.close()
