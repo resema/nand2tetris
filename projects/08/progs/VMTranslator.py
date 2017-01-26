@@ -72,7 +72,8 @@ class Parser:
   # returns  an int
   def arg2(self):
     return self.cmd[2]
-    
+   
+   
 class CodeWriter:
   
   def __init__(self):
@@ -87,7 +88,7 @@ class CodeWriter:
                              "static": "16",
                              "pointer": "3"
                              }
-    self.namespace = "main"
+    self.namespace = ["main"]
     
   def setFileName(self, fileName):
     self.fobj_out = open(fileName, 'w')
@@ -120,13 +121,13 @@ class CodeWriter:
     
   # access the specified segment address
   def accessSegmentAddr(self, segment, index):
-    code = ""
     code = "@" + str(index) + "\n"
     code += "D=A" + "\n"  # D=pointer offset (index)
     code += "@" + self.segments[segment] + "\n"
     code += "A=M+D" + "\n"  # M=RAM[LCL+offset]
     return code
   
+  # access the segment directly and apply and offset
   def accessSpecialAddr(self, segment, index):
     code = "@" + str(index) + "\n"
     code += "D=A" + "\n"  # D=pointer offset (index)
@@ -270,7 +271,7 @@ class CodeWriter:
   # writes the assembly code for label
   #   Label declaration: functionName$Name (main or function name)
   def writeLabel(self, label):
-    gLabel = self.namespace + "$" + label
+    gLabel = self.namespace[len(self.namespace)-1] + "$" + label
     code = ""
     code += "// " + gLabel + "\n"
     code += "(" + gLabel + ")" + "\n"
@@ -278,7 +279,7 @@ class CodeWriter:
     
   # writes the assembly code for goto
   def writeGoto(self, label):
-    gLabel = self.namespace + "$" + label
+    gLabel = self.namespace[len(self.namespace)-1] + "$" + label
     code = ""
     code += "// goto " + gLabel + "\n"
     code += "@" + gLabel + "\n"
@@ -287,7 +288,7 @@ class CodeWriter:
     
   # writes the assembly code for the if-goto
   def writeIf(self, label):
-    gLabel = self.namespace + "$" + label
+    gLabel = self.namespace[len(self.namespace)-1] + "$" + label
     code = ""
     code += "// if-goto " + gLabel + "\n"
     code += self.decreaseAndAccessSP()
@@ -302,11 +303,25 @@ class CodeWriter:
     
   # writes the assembly code for the return command
   def writeReturn(self):
-    pass
+    code = "// return " + "\n" 
+    code += self.accessSegmentAddr("local", 0)
+    code += "D=M" + "\n"
+    code += self.accessSpecialAddr("temp", 0)
+    code += "M=D" + "\n"                                      # frame = R5 =LCL
+    
+    self.namespace.pop()    # removes the last nested namespace from the list
     
   # writes the translation of the given function
   def writeFunction(self, functionName, numLocals):
-    pass
+    self.namespace.append(functionName)   # appends a new nested namespace to the lsit
+    code = ""
+    code += "// function " + functionName + " " + numLocals + "\n"
+    code += "(" + functionName + ")" + "\n"
+    self.fobj_out.write(code + "\n")
+
+    for idx in range(int(numLocals)):
+      self.writePushPop("C_PUSH", "constant", str(0))
+      self.writePushPop("C_POP",  "local", idx)
     
 # ******************
 # MAIN
@@ -337,6 +352,8 @@ if __name__ == "__main__":
       codeWriter.writeGoto(parser.arg1())
     elif cmd == "C_IF":
       codeWriter.writeIf(parser.arg1())
+    elif cmd == "C_FUNCTION":
+      codeWriter.writeFunction(parser.arg1(), parser.arg2())
 
     
   # close input and output file
