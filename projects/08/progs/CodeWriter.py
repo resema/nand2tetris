@@ -262,9 +262,10 @@ class CodeWriter:
     code += "// *ARG = pop" + "\n"
     code += "M=D" + "\n"                                      # *ARG = pop
     code += "@ARG" + "\n"
-    code += "D=M" + "\n"
+    code += "A=M" + "\n"
+    code += "D=A" + "\n"
+    code += "// SP = ARG + 1" + "\n"
     code += "@SP" + "\n"
-    code += "// SP = ARG + 1"
     code += "M=D+1" + "\n"                                  # SP=ARG+1
     code += "// THAT = *(frame -1)" + "\n"  
     code += self.restoreCaller(1, "THAT")                # THAT = *(frame-1)
@@ -276,6 +277,7 @@ class CodeWriter:
     code += self.restoreCaller(4, "LCL")                  # LCL = *(frame-4)    
     code += "// goto returnAddr" + "\n"
     code += "@R6" + "\n"                                      # goto returnAddress
+    code += "A=M" + "\n"
     code += "0;JMP" + "\n"
     self.fobj_out.write(code + "\n")
     self.namespace.pop()    # removes the last nested namespace from the list
