@@ -26,7 +26,7 @@ if __name__ == "__main__":
   # initialize parser and codewriter
   parser = Parser.Parser(args.input)
   codeWriter = CodeWriter.CodeWriter()
-  codeWriter.setFileName(args.output)
+  codeWriter.setFileName(fileName)
   
   # bootstrap init
   codeWriter.writeInit()
@@ -49,6 +49,8 @@ if __name__ == "__main__":
       codeWriter.writeFunction(parser.arg1(), parser.arg2())
     elif cmd == "C_RETURN":
       codeWriter.writeReturn()
+    elif cmd == "C_CALL":
+      codeWriter.writeCall(parser.arg1(), parser.arg2())
 
     
   # close input and output file

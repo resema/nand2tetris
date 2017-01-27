@@ -299,6 +299,14 @@ class CodeWriter:
     code += "D=M-D" + "\n"
     code += "@ARG" + "\n"
     code += "M=D" + "\n"
+    code += "// reposition LCL for called function" + "\n"
+    code += "@SP" + "\n"
+    code += "D=M" + "\n"
+    code += "@LCL" + "\n"
+    code += "M=D" + "\n"
+    code += "// goto function" + "\n"
+    code += "@" + functionName + "$func" + "\n"
+    code += "0;JMP" + "\n"
     self.fobj_out.write(code + "\n")
   
   # writes the assembly code for the return command
@@ -344,7 +352,7 @@ class CodeWriter:
     self.namespace.append(functionName)   # appends a new nested namespace to the lsit
     code = ""
     code += "// function " + functionName + " " + numLocals + "\n"
-    code += "(" + functionName + ")" + "\n"
+    code += "(" + functionName + "$func" + ")" + "\n"
     self.fobj_out.write(code + "\n")
     for idx in range(int(numLocals)):
       self.writePushPop("C_PUSH", "constant", str(0))
