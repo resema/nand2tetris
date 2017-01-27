@@ -80,7 +80,20 @@ class CodeWriter:
    
   # writes the bootstrap bod
   def writeInit(self):
-    pass
+    code = "// Bootstrap init" + "\n"
+    code += "@256" + "\n"
+    code += "D=A" + "\n"
+    code += "@SP" + "\n"
+    code += "M=D" + "\n"  #set SP 256
+    code += "@LCL" + "\n"
+    code += "M=D" + "\n"  #set LCL -1
+    code += "@ARG" + "\n"
+    code += "M=-1" + "\n"  #set ARG -1
+    code += "@THIS" + "\n"
+    code += "M=-1" + "\n"  #set THIS -1
+    code += "@THAT" + "\n"
+    code += "M=-1" + "\n"  #set THAT -1
+    self.fobj_out.write(code)
    
   # writes to the output file the assembly code that implements the given cmd
   def writeArithmetic(self, command):
