@@ -19,13 +19,17 @@ if __name__ == "__main__":
   # parse command line arguments
   parser = argparse.ArgumentParser()
   parser.add_argument("input",  help="input file")
+  parser.add_argument("output",  help="output file")
   args = parser.parse_args()
   fileName = os.path.splitext(args.input )[0] + ".asm"
   
   # initialize parser and codewriter
   parser = Parser.Parser(args.input)
   codeWriter = CodeWriter.CodeWriter()
-  codeWriter.setFileName(fileName)
+  codeWriter.setFileName(args.output)
+  
+  # bootstrap init
+  codeWriter.writeInit()
   
   while parser.hasMoreCommands():
     parser.advance()

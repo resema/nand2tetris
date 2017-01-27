@@ -20,9 +20,14 @@ class CodeWriter:
                              "static": "16",
                              "pointer": "3"
                              }
+    self.filename = ""
     self.namespace = ["main"]
     
   def setFileName(self, fileName):
+    path = fileName.split("/")
+    nameext = path[-1]
+    name = nameext.split(".")
+    self.filename = name[-2]
     self.fobj_out = open(fileName, 'w')
     
   def close(self):
@@ -45,7 +50,6 @@ class CodeWriter:
     
   #push value in D to SP
   def pushDtoSP(self):
-    code = ""
     code = "@SP" + "\n" 
     code += "A=M" + "\n" 
     code += "M=D" + "\n"
@@ -85,15 +89,21 @@ class CodeWriter:
     code += "D=A" + "\n"
     code += "@SP" + "\n"
     code += "M=D" + "\n"  #set SP 256
+    code += self.increaseSP()
     code += "@LCL" + "\n"
-    code += "M=D" + "\n"  #set LCL -1
+    code += "M=D" + "\n"  #set LCL 256
+    code += self.increaseSP()
     code += "@ARG" + "\n"
     code += "M=-1" + "\n"  #set ARG -1
+    code += self.increaseSP()
     code += "@THIS" + "\n"
     code += "M=-1" + "\n"  #set THIS -1
+    code += self.increaseSP()
     code += "@THAT" + "\n"
     code += "M=-1" + "\n"  #set THAT -1
-    self.fobj_out.write(code)
+    code += self.increaseSP()
+    self.fobj_out.write(code + "\n")
+    self.writeCall(self.filename + ".init", 0)
    
   # writes to the output file the assembly code that implements the given cmd
   def writeArithmetic(self, command):
@@ -255,8 +265,42 @@ class CodeWriter:
 
   # writes the assembly code for the call command
   def writeCall(self, functionName, numArgs):
-    pass
-    
+    code = "// call " + functionName + " " + str(numArgs) + "\n"    
+    code += "// save returnAddress" + "\n"
+    code += "(returnAddress)" + "\n"
+    code += "@returnAddress" + "\n"
+    code += "D=A" + "\n"
+    code += self.pushDtoSP()
+    code += self.increaseSP()
+    code += "// save LCL" + "\n"
+    code += "@LCL" + "\n"
+    code += "D=A" + "\n"
+    code += self.pushDtoSP()
+    code += self.increaseSP()
+    code += "// save ARG" + "\n"
+    code += "@ARG" + "\n"
+    code += "D=A" + "\n"
+    code += self.pushDtoSP()
+    code += self.increaseSP()
+    code += "// save THIS" + "\n"
+    code += "@THIS" + "\n"
+    code += "D=A" + "\n"
+    code += self.pushDtoSP()
+    code += self.increaseSP()
+    code += "// save THAT" + "\n"
+    code += "@THAT" + "\n"
+    code += "D=A" + "\n"
+    code += self.pushDtoSP()
+    code += self.increaseSP()
+    code += "// reposition SP for called function" + "\n"
+    code += "@" + str(numArgs+5) + "\n"
+    code += "D=A" + "\n"
+    code += "@SP" + "\n"
+    code += "D=M-D" + "\n"
+    code += "@ARG" + "\n"
+    code += "M=D" + "\n"
+    self.fobj_out.write(code + "\n")
+  
   # writes the assembly code for the return command
   def writeReturn(self):
     code = "// return " + "\n" 
