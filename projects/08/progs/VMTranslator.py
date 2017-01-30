@@ -19,7 +19,7 @@ if __name__ == "__main__":
   # parse command line arguments
   parser = argparse.ArgumentParser()
   parser.add_argument("input",  help="input file")
-  parser.add_argument("output",  help="output file")
+#  parser.add_argument("output",  help="output file")
   args = parser.parse_args()
   fileName = os.path.splitext(args.input )[0] + ".asm"
   

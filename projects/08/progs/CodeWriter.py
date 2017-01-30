@@ -10,7 +10,7 @@ class CodeWriter:
   
   def __init__(self):
     self.fobj_out = ""
-    self.lableCnt = 0
+    self.labelCnt = 0
     self.varCnt = 0
     self.segments = { "local": "LCL",
                              "argument": "ARG",
@@ -85,25 +85,29 @@ class CodeWriter:
   # writes the bootstrap bod
   def writeInit(self):
     code = "// Bootstrap init" + "\n"
-    code += "@256" + "\n"
+    code += "@261" + "\n"
     code += "D=A" + "\n"
     code += "@SP" + "\n"
     code += "M=D" + "\n"  #set SP 256
-    code += self.increaseSP()
     code += "@LCL" + "\n"
     code += "M=D" + "\n"  #set LCL 256
-    code += self.increaseSP()
+    code += "@256" + "\n"
+    code += "D=A" + "\n"
     code += "@ARG" + "\n"
-    code += "M=-1" + "\n"  #set ARG -1
-    code += self.increaseSP()
+    code += "M=D" + "\n"  #set ARG 256
+    code += "@3000" + "\n"
+    code += "D=A" + "\n"
     code += "@THIS" + "\n"
-    code += "M=-1" + "\n"  #set THIS -1
-    code += self.increaseSP()
+    code += "M=D" + "\n"  #set THIS 3000
+    code += "@4000" + "\n"
+    code += "D=A" + "\n"
     code += "@THAT" + "\n"
-    code += "M=-1" + "\n"  #set THAT -1
-    code += self.increaseSP()
+    code += "M=D" + "\n"  #set THAT 4000
+    code += "// goto function" + "\n"
+    code += "@" + self.filename + ".init$func" + "\n"
+    code += "0;JMP" + "\n"
     self.fobj_out.write(code + "\n")
-    self.writeCall(self.filename + ".init", 0)
+    # self.writeCall(self.filename + ".init", 0)
    
   # writes to the output file the assembly code that implements the given cmd
   def writeArithmetic(self, command):
@@ -267,33 +271,36 @@ class CodeWriter:
   def writeCall(self, functionName, numArgs):
     code = "// call " + functionName + " " + str(numArgs) + "\n"    
     code += "// save returnAddress" + "\n"
-    code += "(returnAddress)" + "\n"
-    code += "@returnAddress" + "\n"
+    code += "@returnAddress$" + str(self.labelCnt) + "\n"
     code += "D=A" + "\n"
     code += self.pushDtoSP()
     code += self.increaseSP()
     code += "// save LCL" + "\n"
     code += "@LCL" + "\n"
+    code += "A=M" + "\n"
     code += "D=A" + "\n"
     code += self.pushDtoSP()
     code += self.increaseSP()
     code += "// save ARG" + "\n"
     code += "@ARG" + "\n"
+    code += "A=M" + "\n"
     code += "D=A" + "\n"
     code += self.pushDtoSP()
     code += self.increaseSP()
     code += "// save THIS" + "\n"
     code += "@THIS" + "\n"
+    code += "A=M" + "\n"
     code += "D=A" + "\n"
     code += self.pushDtoSP()
     code += self.increaseSP()
     code += "// save THAT" + "\n"
     code += "@THAT" + "\n"
+    code += "A=M" + "\n"
     code += "D=A" + "\n"
     code += self.pushDtoSP()
     code += self.increaseSP()
     code += "// reposition SP for called function" + "\n"
-    code += "@" + str(numArgs+5) + "\n"
+    code += "@" + str(5+int(numArgs)) + "\n"
     code += "D=A" + "\n"
     code += "@SP" + "\n"
     code += "D=M-D" + "\n"
@@ -307,18 +314,20 @@ class CodeWriter:
     code += "// goto function" + "\n"
     code += "@" + functionName + "$func" + "\n"
     code += "0;JMP" + "\n"
+    code += "(returnAddress$" + str(self.labelCnt) + ")" + "\n"
     self.fobj_out.write(code + "\n")
+    self.labelCnt += 1
   
   # writes the assembly code for the return command
   def writeReturn(self):
     code = "// return " + "\n" 
     code += self.accessSegmentAddr("local", 0)
-    code += "D=M" + "\n"
-    code += self.accessSpecialAddr("temp", 0)
-    code += "// frame = R5 = LCL" + "\n"
-    code += "M=D" + "\n"                                      # frame = R5 = LCL
-    code += "// retAddr = R6 = *(frame-5)" + "\n"
-    code += self.restoreCaller(5, "R6")                    # retAddr = R6 = *(frame-5)
+    code += "D=A" + "\n"
+    code += "// frame = R13 = LCL" + "\n"
+    code += "@R13" + "\n"
+    code += "M=D" + "\n"                                      # frame = R13 = LCL
+    code += "// retAddr = R14 = *(frame-5)" + "\n"
+    code += self.restoreCaller(5, "R14")                    # retAddr = R14= *(frame-5)
     code += "// D = top of stack = pop" + "\n"
     code += self.decreaseAndAccessSP()
     code += "D=M" + "\n"                                      # D = top of stack = pop
@@ -341,7 +350,7 @@ class CodeWriter:
     code += "// LCL = *(frame -4)" + "\n"
     code += self.restoreCaller(4, "LCL")                  # LCL = *(frame-4)    
     code += "// goto returnAddr" + "\n"
-    code += "@R6" + "\n"                                      # goto returnAddress
+    code += "@R14" + "\n"                                      # goto returnAddress
     code += "A=M" + "\n"
     code += "0;JMP" + "\n"
     self.fobj_out.write(code + "\n")
