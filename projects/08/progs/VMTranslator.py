@@ -23,18 +23,19 @@ if __name__ == "__main__":
   parser.add_argument("--dir", help="input directory")
   args = parser.parse_args()
   
+  filesToParse = []
+  
   # separate file from directory
   if args.dir:
-    files = [f for f in os.listdir(args.dir) if f.endswith(".vm")]
+    files = [args.dir + "/" + f for f in os.listdir(args.dir) if f.endswith(".vm")]
     print(files)
     path = args.dir.split("/")
     dirName = path[-1]
     fileName = args.dir + "/" + dirName + ".asm"
-    parser = Parser.Parser(args.dir + "/" + files[0])
+    filesToParse = files
   else:
     fileName = os.path.splitext(args.file)[0] + ".asm"
-    parser = Parser.Parser(args.file)
-
+    filesToParse.append(args.file)
   
   # initialize parser
   codeWriter = CodeWriter.CodeWriter()
@@ -43,26 +44,28 @@ if __name__ == "__main__":
   # bootstrap init
   codeWriter.writeInit()
   
-  while parser.hasMoreCommands():
-    parser.advance()
-    cmd = parser.commandType()
-    
-    if cmd == "C_PUSH" or cmd == "C_POP":
-      codeWriter.writePushPop(cmd, parser.arg1(), parser.arg2())
-    elif cmd == "C_ARITHMETIC":
-      codeWriter.writeArithmetic(parser.arg1())
-    elif cmd == "C_LABEL":
-      codeWriter.writeLabel(parser.arg1())
-    elif cmd == "C_GOTO":
-      codeWriter.writeGoto(parser.arg1())
-    elif cmd == "C_IF":
-      codeWriter.writeIf(parser.arg1())
-    elif cmd == "C_FUNCTION":
-      codeWriter.writeFunction(parser.arg1(), parser.arg2())
-    elif cmd == "C_RETURN":
-      codeWriter.writeReturn()
-    elif cmd == "C_CALL":
-      codeWriter.writeCall(parser.arg1(), parser.arg2())
+  for file in filesToParse:
+    parser = Parser.Parser(file)
+    while parser.hasMoreCommands():
+      parser.advance()
+      cmd = parser.commandType()
+      
+      if cmd == "C_PUSH" or cmd == "C_POP":
+        codeWriter.writePushPop(cmd, parser.arg1(), parser.arg2())
+      elif cmd == "C_ARITHMETIC":
+        codeWriter.writeArithmetic(parser.arg1())
+      elif cmd == "C_LABEL":
+        codeWriter.writeLabel(parser.arg1())
+      elif cmd == "C_GOTO":
+        codeWriter.writeGoto(parser.arg1())
+      elif cmd == "C_IF":
+        codeWriter.writeIf(parser.arg1())
+      elif cmd == "C_FUNCTION":
+        codeWriter.writeFunction(parser.arg1(), parser.arg2())
+      elif cmd == "C_RETURN":
+        codeWriter.writeReturn()
+      elif cmd == "C_CALL":
+        codeWriter.writeCall(parser.arg1(), parser.arg2())
 
     
   # close input and output file
