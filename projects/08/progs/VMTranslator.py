@@ -5,6 +5,7 @@
 #
 #***********************************************************
 
+import sys
 import argparse
 import re
 import os 
@@ -18,13 +19,24 @@ import Parser, CodeWriter
 if __name__ == "__main__":
   # parse command line arguments
   parser = argparse.ArgumentParser()
-  parser.add_argument("input",  help="input file")
-#  parser.add_argument("output",  help="output file")
+  parser.add_argument("--file", help="input file")
+  parser.add_argument("--dir", help="input directory")
   args = parser.parse_args()
-  fileName = os.path.splitext(args.input )[0] + ".asm"
   
-  # initialize parser and codewriter
-  parser = Parser.Parser(args.input)
+  # separate file from directory
+  if args.dir:
+    files = [f for f in os.listdir(args.dir) if f.endswith(".vm")]
+    print(files)
+    path = args.dir.split("/")
+    dirName = path[-1]
+    fileName = args.dir + "/" + dirName + ".asm"
+    parser = Parser.Parser(args.dir + "/" + files[0])
+  else:
+    fileName = os.path.splitext(args.file)[0] + ".asm"
+    parser = Parser.Parser(args.file)
+
+  
+  # initialize parser
   codeWriter = CodeWriter.CodeWriter()
   codeWriter.setFileName(fileName)
   

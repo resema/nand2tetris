@@ -64,11 +64,16 @@ class CodeWriter:
     return code
   
   # access the segment directly and apply and offset
-  def accessSpecialAddr(self, segment, index):      # accessing temp, static, poitner
+  def accessSpecialAddr(self, segment, index):      # accessing temp, static, pointer
     code = "@" + str(index) + "\n"
     code += "D=A" + "\n"  # D=pointer offset (index)
     code += "@" + self.segments[segment] + "\n"
     code += "A=A+D" + "\n"  # M=RAM[R5+offset]
+    return code
+    
+  # access the static segment addresses
+  def accessStaticAddr(self, index):
+    code = "@" + self.filename + "." + str(index) + "\n"
     return code
     
   #returns the content of the register with an negative offset from the LCL
@@ -88,9 +93,9 @@ class CodeWriter:
     code += "@261" + "\n"
     code += "D=A" + "\n"
     code += "@SP" + "\n"
-    code += "M=D" + "\n"  #set SP 256
+    code += "M=D" + "\n"  #set SP 261
     code += "@LCL" + "\n"
-    code += "M=D" + "\n"  #set LCL 256
+    code += "M=D" + "\n"  #set LCL 261
     code += "@256" + "\n"
     code += "D=A" + "\n"
     code += "@ARG" + "\n"
@@ -107,7 +112,6 @@ class CodeWriter:
     code += "@" + self.filename + ".init$func" + "\n"
     code += "0;JMP" + "\n"
     self.fobj_out.write(code + "\n")
-    # self.writeCall(self.filename + ".init", 0)
    
   # writes to the output file the assembly code that implements the given cmd
   def writeArithmetic(self, command):
@@ -208,7 +212,13 @@ class CodeWriter:
         code += "D=A" + "\n" 
         code += self.pushDtoSP()
         code += self.increaseSP()
-      elif segment == "temp" or segment == "static" or segment == "pointer":
+      elif segment == "static":
+        code = "// push " + segment + " " + str(index) + "\n"
+        code += "@" + str(index) + "\n"
+        code += "D=A" + "\n"  # D=pointer offset (index)
+        code += self.accessStaticAddr(index)
+        code += "M=D" + "\n"
+      elif segment == "temp" or segment == "pointer":
         code = "// push " + segment + " " + str(index) + "\n"
         code += self.accessSpecialAddr(segment, index)
         code += "D=M" + "\n" # D= RAM[R5+offset]
@@ -222,8 +232,10 @@ class CodeWriter:
         code += self.increaseSP()      
     elif command == "C_POP":
       code = "// pop " + segment + " " + str(index) + "\n"
-      if segment == "temp" or segment == "static" or segment == "pointer":
+      if segment == "temp" or segment == "pointer":
         code += self.accessSpecialAddr(segment, index)
+      elif segment == "static":
+        code += self.accessStaticAddr(index)
       else:
         # get the RAM[seg+index]
         code += self.accessSegmentAddr(segment, index)      
@@ -299,7 +311,7 @@ class CodeWriter:
     code += "D=A" + "\n"
     code += self.pushDtoSP()
     code += self.increaseSP()
-    code += "// reposition SP for called function" + "\n"
+    code += "// reposition ARG for called function" + "\n"
     code += "@" + str(5+int(numArgs)) + "\n"
     code += "D=A" + "\n"
     code += "@SP" + "\n"
