@@ -20,14 +20,21 @@ class CodeWriter:
                              "static": "16",
                              "pointer": "3"
                              }
-    self.filename = ""
+    self.outFilename = ""
     self.namespace = [""]
-    
-  def setFileName(self, fileName):
-    path = fileName.split("/")
+    self.filename = ""
+  
+  def setFileName(self, name):
+    path = name.split("/")
     nameext = path[-1]
     name = nameext.split(".")
     self.filename = name[-2]
+    
+  def setOutFileName(self, fileName):
+    path = fileName.split("/")
+    nameext = path[-1]
+    name = nameext.split(".")
+    self.outFilename = name[-2]
     self.fobj_out = open(fileName, 'w')
     
   def close(self):
@@ -95,7 +102,7 @@ class CodeWriter:
     code += "@SP" + "\n"
     code += "M=D" + "\n"  #set SP 261
     code += "@LCL" + "\n"
-    code += "M=D" + "\n"  #set LCL 261
+    code += "M=-1" + "\n"  #set LCL 261
     code += "@256" + "\n"
     code += "D=A" + "\n"
     code += "@ARG" + "\n"
@@ -103,14 +110,13 @@ class CodeWriter:
     code += "@3000" + "\n"
     code += "D=A" + "\n"
     code += "@THIS" + "\n"
-    code += "M=D" + "\n"  #set THIS 3000
+    code += "M=-1" + "\n"  #set THIS 3000
     code += "@4000" + "\n"
     code += "D=A" + "\n"
     code += "@THAT" + "\n"
-    code += "M=D" + "\n"  #set THAT 4000
+    code += "M=-1" + "\n"  #set THAT 4000
     code += "// goto function" + "\n"
     code += "@Sys.init$func" + "\n"
-    # code += "@" + self.filename + ".init$func" + "\n"
     code += "0;JMP" + "\n"
     self.fobj_out.write(code + "\n")
    

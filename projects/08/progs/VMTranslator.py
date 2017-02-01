@@ -39,13 +39,15 @@ if __name__ == "__main__":
   
   # initialize parser
   codeWriter = CodeWriter.CodeWriter()
-  codeWriter.setFileName(fileName)
+  codeWriter.setOutFileName(fileName)
   
   # bootstrap init
   codeWriter.writeInit()
   
   for file in filesToParse:
     parser = Parser.Parser(file)
+    codeWriter.setFileName(file)
+    
     while parser.hasMoreCommands():
       parser.advance()
       cmd = parser.commandType()
