@@ -21,7 +21,7 @@ class CodeWriter:
                              "pointer": "3"
                              }
     self.filename = ""
-    self.namespace = ["main"]
+    self.namespace = [""]
     
   def setFileName(self, fileName):
     path = fileName.split("/")
@@ -153,14 +153,14 @@ class CodeWriter:
       code += self.decreaseAndAccessSP()  #M=x
       code += "D=M-D" + "\n"
       code += "M=-1" + "\n"  #x=-1 (true)
-      code += "@LESS"+ str(self.labelCnt)  + "\n"
+      code += "@LESS."+ str(self.labelCnt)  + "\n"
       code += "D;JLT" + "\n"    #x<y -> equal @SP = -1 (true)
       code += "@SP" + "\n"
       code += "A=M" + "\n"
       code += "M=0" + "\n"  # x!=y -> not equal @SP = 0 (false)
-      code += "(LESS" + str(self.labelCnt) + ")" + "\n"
+      code += "(LESS." + str(self.labelCnt) + ")" + "\n"
       code += self.increaseSP()
-      self.lableCnt += 1
+      self.labelCnt += 1
     elif command == "gt":
       code = "// gt" + "\n"
       code += self.decreaseAndAccessSP()
@@ -168,14 +168,14 @@ class CodeWriter:
       code += self.decreaseAndAccessSP()  #M=x
       code += "D=M-D" + "\n"
       code += "M=-1" + "\n"  #x=-1 (true)
-      code += "@GREATER"+ str(self.labelCnt)  + "\n"
+      code += "@GREATER."+ str(self.labelCnt)  + "\n"
       code += "D;JGT" + "\n"    #x<y -> equal @SP = -1 (true)
       code += "@SP" + "\n"
       code += "A=M" + "\n"
       code += "M=0" + "\n"  # x!=y -> not equal @SP = 0 (false)
-      code += "(GREATER" + str(self.labelCnt) + ")" + "\n"
+      code += "(GREATER." + str(self.labelCnt) + ")" + "\n"
       code += self.increaseSP()
-      self.lableCnt += 1
+      self.labelCnt += 1
     elif command == "neg":
       code = "// neg" + "\n"
       code += self.decreaseAndAccessSP()
@@ -215,10 +215,12 @@ class CodeWriter:
         code += self.increaseSP()
       elif segment == "static":
         code = "// push " + segment + " " + str(index) + "\n"
-        code += "@" + str(index) + "\n"
-        code += "D=A" + "\n"  # D=pointer offset (index)
+        # code += "@" + str(index) + "\n"
+        # code += "D=A" + "\n"  # D=pointer offset (index)
         code += self.accessStaticAddr(index)
-        code += "M=D" + "\n"
+        code += "D=M" + "\n"
+        code += self.pushDtoSP()
+        code += self.increaseSP()   
       elif segment == "temp" or segment == "pointer":
         code = "// push " + segment + " " + str(index) + "\n"
         code += self.accessSpecialAddr(segment, index)
@@ -367,10 +369,12 @@ class CodeWriter:
     code += "A=M" + "\n"
     code += "0;JMP" + "\n"
     self.fobj_out.write(code + "\n")
-    self.namespace.pop()    # removes the last nested namespace from the list
+    # self.namespace.pop()    # removes the last nested namespace from the list
     
   # writes the translation of the given function
   def writeFunction(self, functionName, numLocals):
+    if len(self.namespace) > 0:
+          self.namespace.pop()    # removes the last nested namespace from the list
     self.namespace.append(functionName)   # appends a new nested namespace to the lsit
     code = ""
     code += "// function " + functionName + " " + numLocals + "\n"

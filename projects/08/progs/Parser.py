@@ -37,8 +37,7 @@ class Parser:
     self.fobj_in = open(fileName)
     
     for line in self.fobj_in:
-      newline = re.sub("//\s.*", "", line) # remove comments
-      newline = re.sub("//.*?\n", "", newline) # remove comments
+      newline = re.sub("\s*//.*?\n", "", line) # remove comments
       newline = re.sub("\\n", "", newline) # remove empty lines
       if newline != "":
         self.rawCmds.insert(len(self.rawCmds), newline)
