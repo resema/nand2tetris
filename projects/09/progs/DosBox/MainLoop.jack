@@ -1,0 +1,35 @@
+/** Main Loop for the Dos Box to handle user inputs */
+
+class MainLoop {
+  
+  field Inventory _inventory;
+  
+  constructor MainLoop new() {
+    let _inventory = Inventory.new();
+    return this;
+  }
+  
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+
+  method void run() {
+    var String line;
+    var boolean exit;
+    let exit = false;
+    
+    while(~(exit)) {
+      let line = Keyboard.readLine("C:>");
+      
+      do _inventory.checkInput(line);
+            
+      // quit loop
+      if (line.length() = 1 & line.charAt(0) = 81) {
+        let exit = true;
+      }
+    }
+    
+    return;
+  }
+}

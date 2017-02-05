@@ -1,0 +1,12 @@
+/** Dos Box simulates a files system for Jack */
+
+class Main {
+  function void main() {
+    var MainLoop _mainloop;
+    let _mainloop = MainLoop.new();
+    
+    do _mainloop.run();
+   
+    return;
+  }
+}

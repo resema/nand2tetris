@@ -1,0 +1,19 @@
+/** Directory class for DosBox */
+
+class Directory {
+  field String _name;
+  
+  constructor Directory new(String name) {
+    let _name = name;
+    return this;
+  }
+  
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+  
+  method String getName() {
+    return _name;
+  }
+}

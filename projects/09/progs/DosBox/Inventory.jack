@@ -1,0 +1,59 @@
+/** Inventory class for DosBox containing Files and Directories*/
+
+class Inventory {
+  field Array _directories;
+  field int _amountOfDirectories;
+  
+  field Array _files;
+  field int _amountOfFiles;
+  
+  constructor Inventory new() {
+    let _directories = Array.new(1);
+    let _amountOfDirectories = 0;
+    let _files = Array.new(1);
+    let _amountOfFiles = 0;
+    return this;
+  }
+  
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+  
+  method void checkInput(String cmd) {
+    if (cmd.length() = 3) {
+      // "dir" called
+      if (cmd.charAt(0) = 68 & cmd.charAt(1) = 73 & cmd.charAt(2) = 82) {
+        do printDirectories();
+      }        
+    }
+    if (~(cmd.length() < 2)) {
+      if (cmd.charAt(0) = 77 & cmd.charAt(1) =75) {
+        do createTestDirectories();
+      }
+    }
+    
+    return;
+  }
+  
+  method void printDirectories() {
+    var Directory cur;
+    var int i;
+    let i = 0;
+    while (i < _amountOfDirectories) {
+      let cur = _directories[0];
+      do Output.printString(cur.getName());
+      do Output.printChar(String.newLine());
+      let i = i+1;
+    }
+    return;
+  }
+  
+  method void createTestDirectories() {
+    var Directory _testDir;
+    let _testDir = Directory.new("test");
+    let _directories[0] = _testDir;
+    let _amountOfDirectories = 1;
+    return;
+  }
+}
