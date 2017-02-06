@@ -6,7 +6,8 @@ class Main {
     let _mainloop = MainLoop.new();
     
     do _mainloop.run();
-   
+    do _mainloop.dispose();
+    
     return;
   }
 }

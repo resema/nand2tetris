@@ -2,10 +2,11 @@
 
 class MainLoop {
   
+  field String _path;
   field Inventory _inventory;
   
   constructor MainLoop new() {
-    let _inventory = Inventory.new();
+    let _inventory = Inventory.new("C:>");
     return this;
   }
   
@@ -20,7 +21,8 @@ class MainLoop {
     let exit = false;
     
     while(~(exit)) {
-      let line = Keyboard.readLine("C:>");
+      let _path = _inventory.getName();
+      let line = Keyboard.readLine(_path);
       
       do _inventory.checkInput(line);
             
@@ -29,6 +31,8 @@ class MainLoop {
         let exit = true;
       }
     }
+    
+    // do _inventory.dispose();
     
     return;
   }

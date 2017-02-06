@@ -1,35 +1,63 @@
 /** Inventory class for DosBox containing Files and Directories*/
 
 class Inventory {
+  field String _name;
+  
+  // List properties
+  field Inventory _this;
+  field Inventory _next;
+  
   field Array _directories;
   field int _amountOfDirectories;
   
   field Array _files;
   field int _amountOfFiles;
   
-  constructor Inventory new() {
-    let _directories = Array.new(1);
-    let _amountOfDirectories = 0;
+  constructor Inventory new(String name) {
+    let _name = name;
+    let _this = this;
+    let _next = null;
+    
+    // let _directories = array.new(1);
+    // let _amountOfDirectories = 0;
     let _files = Array.new(1);
     let _amountOfFiles = 0;
+    
     return this;
   }
   
   method void dispose() {
+    if (~(_next = null)) {
+      do next.dispose();
+    }
     do Memory.deAlloc(this);
     return;
   }
   
+  /** Accessors */
+  method String getName() { return _name; }
+  method Inventory getThis() { return _this; }
+  method Inventory getNext() { return _next; }
+  method void setNext(Inventory next) { let _next = next;  return; }
+  
+  
   method void checkInput(String cmd) {
     if (cmd.length() = 3) {
-      // "dir" called
+      // "dir"
       if (cmd.charAt(0) = 68 & cmd.charAt(1) = 73 & cmd.charAt(2) = 82) {
         do printDirectories();
       }        
     }
     if (~(cmd.length() < 2)) {
+      // "mk"
       if (cmd.charAt(0) = 77 & cmd.charAt(1) =75) {
         do createTestDirectories();
+      }
+      // "cd"
+      if (cmd.charAt(0) = 67 & cmd.charAt(1) = 68) {
+        if (_amountOfDirectories > 0) {
+          
+        }
       }
     }
     
@@ -37,21 +65,19 @@ class Inventory {
   }
   
   method void printDirectories() {
-    var Directory cur;
-    var int i;
-    let i = 0;
-    while (i < _amountOfDirectories) {
-      let cur = _directories[0];
-      do Output.printString(cur.getName());
+    var Inventory current;
+    let current = this;
+    while (~(current = null)) {
+      do Output.printString(current.getName());
       do Output.printChar(String.newLine());
-      let i = i+1;
+      let current = current.getNext();
     }
     return;
   }
   
   method void createTestDirectories() {
-    var Directory _testDir;
-    let _testDir = Directory.new("test");
+    var Inventory _testDir;
+    let _testDir = Inventory.new("test");
     let _directories[0] = _testDir;
     let _amountOfDirectories = 1;
     return;
