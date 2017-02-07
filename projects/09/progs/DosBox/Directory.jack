@@ -21,6 +21,8 @@ class Directory {
     return;
   }
   
+  method Directory getPrevious() { return _previous; }
+  
   method String getName() { return _name; }
   method int getNumberOfChildDirectories() { return _amountOfDirectories; }
   method void setPrevious(Directory prev) { 
@@ -32,9 +34,14 @@ class Directory {
     var int idx;
     let idx = _amountOfDirectories;
     let _amountOfDirectories = _amountOfDirectories + 1;
-    let _directories = Array.new(_amountOfDirectories);
+    let _directories = Directory.extend(_directories, _amountOfDirectories);
     let _directories[idx] = dir;
     return; 
+  }
+  
+  method Directory enterDirectory(String name) {
+    // let _previous = 
+    return _directories[0];
   }
   
   method void print() {
@@ -48,5 +55,17 @@ class Directory {
       let i = i + 1;
     }
     return;
+  }
+  
+  function Array extend(Array arr, int sz) {
+    var int i;
+    var Array ret;
+    let i = 0;
+    let ret = Array.new(sz+1);
+    while (i < sz) {
+      let ret[i] = arr[i];
+      let i = i + 1;
+    }
+    return ret;
   }
 }

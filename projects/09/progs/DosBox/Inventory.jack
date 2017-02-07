@@ -22,7 +22,16 @@ class Inventory {
   }
   
   /** Accessors */
-  method String getName() { return _current.getName(); }
+  method String getName() { 
+    var Directory previous;
+    let previous = _current.getPrevious();
+    while (~(previous = null)) {
+      do Output.printString(previous.getName());
+      do Output.printChar(String.backSpace());
+      let previous = previous.getPrevious();
+    }
+    return _root.getName(); 
+  }
   
   method void checkInput(String cmd) {
     var String name;
@@ -40,15 +49,18 @@ class Inventory {
       }
       // "mk"
       if (cmd.charAt(0) = 77 & cmd.charAt(1) = 75) {
-        let name = Inventory.eraseFirstChars(cmd, 2);
-        let dir = Directory.new(name);
-        do _current.addDirectory(dir);
+        if (cmd.length() > 3) {
+          let name = Inventory.eraseFirstChars(cmd, 3);
+          let dir = Directory.new(name);
+          do _current.addDirectory(dir);
+        }
       }
       // "cd"
       if (cmd.charAt(0) = 67 & cmd.charAt(1) = 68) {
-        // if (_amountOfDirectories > 0) {
-          // do openDirectory("test");
-        // }
+        if (cmd.length() > 3) {
+          let name = Inventory.eraseFirstChars(cmd, 3);
+          let _current = _current.enterDirectory(name);
+        }
       }
     }
     
@@ -81,8 +93,8 @@ class Inventory {
     var int length, start;
     var String ret;
     let length = str.length();
-    let start = cnt + 1;
-    let ret = String.new(length-cnt-1);
+    let start = cnt;
+    let ret = String.new(length-cnt);
     while (start < length) {
       do ret.appendChar(str.charAt(start));
       let start = start + 1;
