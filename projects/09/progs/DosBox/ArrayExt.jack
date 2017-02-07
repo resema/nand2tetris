@@ -1,0 +1,17 @@
+/** Extend the OS class Array */
+
+class ArrayExt {
+  
+  function Array extend(Array arr, int sz) {
+    var int i;
+    var Array ret;
+    let i = 0;
+    let ret = Array.new(sz+1);
+    while (i < sz) {
+      let ret[i] = arr[i];
+      let i = i + 1;
+    }
+    return ret;
+  }
+
+}

@@ -6,7 +6,7 @@ class MainLoop {
   field Inventory _inventory;
   
   constructor MainLoop new() {
-    let _inventory = Inventory.new("C:>");
+    let _inventory = Inventory.new("C:");
     return this;
   }
   

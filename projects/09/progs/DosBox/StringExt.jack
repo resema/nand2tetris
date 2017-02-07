@@ -1,0 +1,37 @@
+/** Extend the OS class String */
+
+class StringExt {
+  
+  function String eraseFirstChars(String str, int cnt) {
+    var int length, start;
+    var String ret;
+    let length = str.length();
+    let start = cnt;
+    let ret = String.new(length-cnt);
+    while (start < length) {
+      do ret.appendChar(str.charAt(start));
+      let start = start + 1;
+    }
+    return ret;
+  }
+  
+  function String appendString(String first, String second) {
+    var int idx, length1, length2;
+    var String ret;
+    let length1 = first.length();
+    let length2 = second.length();
+    let ret = String.new(length1 + length2);
+    let idx = 0;
+    while (idx < length1) {
+      do ret.appendChar(first.charAt(idx));
+      let idx = idx + 1;
+    }
+    let idx = 0;
+    while (idx < length2) {
+      do ret.appendChar(second.charAt(idx));
+      let idx = idx + 1;
+    }
+    return ret;
+  }
+  
+}
