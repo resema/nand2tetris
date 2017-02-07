@@ -2,9 +2,17 @@
 
 class Directory {
   field String _name;
+  field Directory _previous;
+  
+  field Array _directories;
+  field int _amountOfDirectories;
+  
+  field Array _files;
+  field int _amountOfFiles;
   
   constructor Directory new(String name) {
     let _name = name;
+    let _amountOfDirectories = 0;
     return this;
   }
   
@@ -13,7 +21,32 @@ class Directory {
     return;
   }
   
-  method String getName() {
-    return _name;
+  method String getName() { return _name; }
+  method int getNumberOfChildDirectories() { return _amountOfDirectories; }
+  method void setPrevious(Directory prev) { 
+    let _previous = prev;
+    return;
+  }
+  
+  method void addDirectory(Directory dir) {
+    var int idx;
+    let idx = _amountOfDirectories;
+    let _amountOfDirectories = _amountOfDirectories + 1;
+    let _directories = Array.new(_amountOfDirectories);
+    let _directories[idx] = dir;
+    return; 
+  }
+  
+  method void print() {
+    var Directory dirName;
+    var int i;
+    let i = 0;
+    while (i < _amountOfDirectories) {
+      let dirName = _directories[i];
+      do Output.printString(dirName.getName());
+      do Output.printChar(String.newLine());
+      let i = i + 1;
+    }
+    return;
   }
 }

@@ -2,46 +2,31 @@
 
 class Inventory {
   field String _name;
-  
-  // List properties
-  field Inventory _this;
-  field Inventory _next;
-  
-  field Array _directories;
-  field int _amountOfDirectories;
-  
-  field Array _files;
-  field int _amountOfFiles;
-  
+  field int _depth;
+  field Directory _root, _current;
+    
   constructor Inventory new(String name) {
     let _name = name;
-    let _this = this;
-    let _next = null;
+    let _depth = 0; //root = 0
     
-    // let _directories = array.new(1);
-    // let _amountOfDirectories = 0;
-    let _files = Array.new(1);
-    let _amountOfFiles = 0;
+    let _root = Directory.new(name);
+    do _root.setPrevious(null);
+    let _current = _root;
     
     return this;
   }
   
   method void dispose() {
-    if (~(_next = null)) {
-      do next.dispose();
-    }
     do Memory.deAlloc(this);
     return;
   }
   
   /** Accessors */
-  method String getName() { return _name; }
-  method Inventory getThis() { return _this; }
-  method Inventory getNext() { return _next; }
-  method void setNext(Inventory next) { let _next = next;  return; }
-  
+  method String getName() { return _current.getName(); }
   
   method void checkInput(String cmd) {
+    var String name;
+    var Directory dir;
     if (cmd.length() = 3) {
       // "dir"
       if (cmd.charAt(0) = 68 & cmd.charAt(1) = 73 & cmd.charAt(2) = 82) {
@@ -49,15 +34,21 @@ class Inventory {
       }        
     }
     if (~(cmd.length() < 2)) {
+      // "ls"
+      if (cmd.charAt(0) = 76 & cmd.charAt(1) = 83) {
+        do printDirectories();
+      }
       // "mk"
-      if (cmd.charAt(0) = 77 & cmd.charAt(1) =75) {
-        do createTestDirectories();
+      if (cmd.charAt(0) = 77 & cmd.charAt(1) = 75) {
+        let name = Inventory.eraseFirstChars(cmd, 2);
+        let dir = Directory.new(name);
+        do _current.addDirectory(dir);
       }
       // "cd"
       if (cmd.charAt(0) = 67 & cmd.charAt(1) = 68) {
-        if (_amountOfDirectories > 0) {
-          
-        }
+        // if (_amountOfDirectories > 0) {
+          // do openDirectory("test");
+        // }
       }
     }
     
@@ -65,21 +56,37 @@ class Inventory {
   }
   
   method void printDirectories() {
-    var Inventory current;
-    let current = this;
-    while (~(current = null)) {
-      do Output.printString(current.getName());
-      do Output.printChar(String.newLine());
-      let current = current.getNext();
-    }
+    do _current.print();
     return;
   }
   
-  method void createTestDirectories() {
-    var Inventory _testDir;
-    let _testDir = Inventory.new("test");
-    let _directories[0] = _testDir;
-    let _amountOfDirectories = 1;
-    return;
+  // method void openDirectory(String name) {
+    // var int childs;
+    // let childs = _current.getNumberOfChildDirectories();
+    // if ( childs > 0) {
+      // do Output.printString("juhuu");
+    // }
+    // return;
+  // }
+  
+  // method void createDirectory(String name) {
+    // var Directory _testDir;
+    // let _testDir = Directory.new(name);
+    // let _directories[0] = _testDir;
+    // let _amountOfDirectories = 1;
+    // return;
+  // }
+  
+  function String eraseFirstChars(String str, int cnt) {
+    var int length, start;
+    var String ret;
+    let length = str.length();
+    let start = cnt + 1;
+    let ret = String.new(length-cnt-1);
+    while (start < length) {
+      do ret.appendChar(str.charAt(start));
+      let start = start + 1;
+    }
+    return ret;
   }
 }
