@@ -34,4 +34,25 @@ class StringExt {
     return ret;
   }
   
+  function boolean equals(String first, String second) {
+    var int idx, length1, length2;
+    var boolean ret;
+    let length1 = first.length();
+    let length2 = second.length();
+    let idx = 0;
+    let ret = true;
+    if (length1 = length2) {
+      while (idx < length1) {
+        if (~(first.charAt(idx) = second.charAt(idx))) {
+          let ret = false;
+        }
+        let idx = idx + 1;
+      }
+    }
+    if (~(length1 = length2)) {
+      let ret = false;
+    }
+    return ret;
+  }
+  
 }

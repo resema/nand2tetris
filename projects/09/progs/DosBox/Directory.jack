@@ -42,7 +42,24 @@ class Directory {
   }
   
   method Directory enterDirectory(String name) {
-    return _directories[0];
+    var int idx;
+    var Directory tmp, ret;
+    var boolean checkEquality;
+    let idx = 0;
+    let ret = null;
+    while (idx < _amountOfDirectories) {
+      let tmp = _directories[idx];
+      let checkEquality = StringExt.equals(name, tmp.getName());
+      if (checkEquality) {
+        let ret = tmp;
+      }
+      let idx = idx + 1;
+    }
+    return ret;
+  }
+  
+  method Directory leaveDirectory(String name) {
+    return _previous;
   }
   
   method void print() {

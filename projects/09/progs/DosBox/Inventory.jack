@@ -38,7 +38,7 @@ class Inventory {
   
   method void checkInput(String cmd) {
     var String name;
-    var Directory dir;
+    var Directory tmp, dir;
     if (cmd.length() = 3) {
       // "dir"
       if (cmd.charAt(0) = 68 & cmd.charAt(1) = 73 & cmd.charAt(2) = 82) {
@@ -62,7 +62,17 @@ class Inventory {
       if (cmd.charAt(0) = 67 & cmd.charAt(1) = 68) {
         if (cmd.length() > 3) {
           let name = StringExt.eraseFirstChars(cmd, 3);
-          let _current = _current.enterDirectory(name);
+          if (name.charAt(0) = 46) {
+            if (name.charAt(1) = 46) {
+              let _current = _current.leaveDirectory(name);
+            }
+          }
+          if (~(name.charAt(0) = 46)) {
+            let tmp = _current.enterDirectory(name);
+            if (~(tmp = null)) {
+              let _current = tmp;
+            }
+          }
         }
       }
     }
