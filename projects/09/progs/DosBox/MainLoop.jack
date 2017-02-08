@@ -32,7 +32,7 @@ class MainLoop {
       }
     }
     
-    // do _inventory.dispose();
+    do _inventory.dispose();
     
     return;
   }

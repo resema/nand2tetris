@@ -58,20 +58,25 @@ class Inventory {
           do _current.addDirectory(dir);
         }
       }
+      // "rm"
+      if (cmd.charAt(0) = 82 & cmd.charAt(1) = 77) {
+        if (cmd.length() > 3) {
+          let name = StringExt.eraseFirstChars(cmd, 3);
+          do _current.removeDirectory(name);
+        }
+      }
       // "cd"
       if (cmd.charAt(0) = 67 & cmd.charAt(1) = 68) {
         if (cmd.length() > 3) {
           let name = StringExt.eraseFirstChars(cmd, 3);
-          if (name.charAt(0) = 46) {
+          if (name.charAt(0) = 46 & cmd.length() > 4) {
             if (name.charAt(1) = 46) {
               let _current = _current.leaveDirectory(name);
             }
           }
           if (~(name.charAt(0) = 46)) {
             let tmp = _current.enterDirectory(name);
-            if (~(tmp = null)) {
               let _current = tmp;
-            }
           }
         }
       }
