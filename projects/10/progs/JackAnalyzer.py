@@ -1,7 +1,10 @@
+#!/usr/local/bin/python3
+
+
 #***********************************************************
 # Nand2Tetris Part II
 #
-#    Implementation of the second part of the translator
+#    Implementation of the Analyzer part of the compiler
 #
 #       Last procession step
 #       usage: prompt> JackAnalyzer input
