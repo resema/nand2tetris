@@ -39,3 +39,8 @@ if __name__ == "__main__":
     fileList = files
   else:
     fileList.append(args.file)
+    
+  # Main logic 
+  #   1. Creates a JackTokenizer from filename.jack
+  #   2. Creates output file filename.xml
+  #   3. Creates and uses a CompilationEngine to comple the input into the output file

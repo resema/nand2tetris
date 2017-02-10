@@ -16,15 +16,9 @@
 class JackTokenizer:
 
   # cstor
-  def __init__(self, filename):
-    self.fobj_in = open(filename);
-    self.tokens = []
-    
+  def __init__(self, fobj_in):
+    self.fobj_in = fobj_in    
 
-  # close file object
-  def close(self):
-    self.fobj_in.close()
-    
   # has the input more tokens to process
   def hasMoreTokens(self): 
     pass
@@ -39,4 +33,20 @@ class JackTokenizer:
   def tokenType(self):
     pass
     
-  de
+  def keyWord(self):
+    pass
+    
+  def symbol(self):
+    pass
+    
+  def identifier(self):
+    pass
+    
+  def intVal(self):
+    pass
+    
+  def stringVal(self):
+    pass
+    
+    
+    
