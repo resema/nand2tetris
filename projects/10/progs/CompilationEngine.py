@@ -6,7 +6,7 @@
 #
 #    Implementation of the Core Engine of the Analyzer
 #
-#       Handels  program structure, statements, expressions
+#       Handels program structure, statements, expressions
 #
 #***********************************************************
 

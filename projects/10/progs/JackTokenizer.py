@@ -13,11 +13,25 @@
 #
 #***********************************************************
 
+import re
+
 class JackTokenizer:
 
   # cstor
   def __init__(self, fobj_in):
-    self.fobj_in = fobj_in    
+    self.fobj_in = fobj_in   
+    self.rawlines = []
+    self.tokens = []
+    
+    for line in self.fobj_in:
+      newline = re.sub("\s*//.*?\n", "", line) # remove comments
+      newline = re.sub("\s*/\*.*?\n", "", newline) # remove special comments
+      newline = re.sub("\s*\n", "", newline) # remove empty lines
+      if newline != "":
+        self.rawlines.insert(len(self.rawlines), newline)
+    
+    for l in self.rawlines:
+      print(l)
 
   # has the input more tokens to process
   def hasMoreTokens(self): 
@@ -33,18 +47,28 @@ class JackTokenizer:
   def tokenType(self):
     pass
     
+  # returns the keyword which is the current token
+  #   only called when tokenType is KEYWORD
   def keyWord(self):
     pass
     
+  # returns the character which is the current token
+  #   only called when tokenType is SYMBOL
   def symbol(self):
     pass
     
+  # returns the identifier which is the current token
+  #   only called when tokenType is IDENTIFIER
   def identifier(self):
     pass
-    
+     
+  # returns the integer of the current token
+  #   only called when tokenType is INT_ONST
   def intVal(self):
     pass
     
+  # returns the string value of the current token
+  #   only called when tokenType is STRING_CONST
   def stringVal(self):
     pass
     

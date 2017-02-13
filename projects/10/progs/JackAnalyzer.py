@@ -18,6 +18,8 @@
 import argparse
 import os
 
+import JackTokenizer, CompilationEngine
+
 
 # ******************
 # MAIN
@@ -44,3 +46,18 @@ if __name__ == "__main__":
   #   1. Creates a JackTokenizer from filename.jack
   #   2. Creates output file filename.xml
   #   3. Creates and uses a CompilationEngine to comple the input into the output file
+  for file in fileList:
+    # create filename for in and output file
+    path = file.split(".")
+    noExt = path[-2]
+    filename = noExt + ".xml"
+    print(filename)
+    fobj_in = open(file)
+    fobj_out = open(filename, 'w')
+    
+    tknzr = JackTokenizer.JackTokenizer(fobj_in)
+  
+  fobj_in.close()
+  fobj_out.close()
+  
+  
