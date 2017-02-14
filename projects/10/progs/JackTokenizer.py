@@ -15,6 +15,8 @@
 
 import re
 
+from Defines import *
+
 class JackTokenizer:
 
   # cstor
@@ -22,6 +24,7 @@ class JackTokenizer:
     self.fobj_in = fobj_in   
     self.rawlines = []
     self.tokens = []
+    self.token = ""
     
     for line in self.fobj_in:
       newline = re.sub("\s*//.*?\n", "", line) # remove comments
@@ -30,22 +33,23 @@ class JackTokenizer:
       if newline != "":
         self.rawlines.insert(len(self.rawlines), newline)
     
-    for l in self.rawlines:
-      print(l)
+  # tokenizes the input file
+  def tokenize(self):
+    pass
 
   # has the input more tokens to process
   def hasMoreTokens(self): 
-    pass
+    return len(self.tokens) > 0
   
   # returns next token
   #   should ONLY be called, if "hasMoreTokens" is true
   # groups inputs into tokens
   def advance(self):
-    pass
+    self.token = self.tokens.pop(0)
     
   # returns the type of the current process token 
   def tokenType(self):
-    pass
+    return symbols[self.token]
     
   # returns the keyword which is the current token
   #   only called when tokenType is KEYWORD
