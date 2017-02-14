@@ -56,6 +56,7 @@ if __name__ == "__main__":
     fobj_out = open(filename, 'w')
     
     tknzr = JackTokenizer.JackTokenizer(fobj_in)
+    tknzr.tokenize();
   
   fobj_in.close()
   fobj_out.close()

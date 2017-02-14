@@ -30,13 +30,23 @@ class JackTokenizer:
       newline = re.sub("\s*//.*?\n", "", line) # remove comments
       newline = re.sub("\s*/\*.*?\n", "", newline) # remove special comments
       newline = re.sub("\s*\n", "", newline) # remove empty lines
+      newline = re.sub("^\s*", "", newline) # remove spaces at the beginning
       if newline != "":
         self.rawlines.insert(len(self.rawlines), newline)
-    
+         
   # tokenizes the input file
   def tokenize(self):
-    pass
-
+    list = []
+    for line in self.rawlines:
+      list = line.split(" ");
+      for l in list:
+        list2 = l.split(".");
+        for l in list2:
+          if l != "":
+            self.tokens.insert(len(self.tokens), l)
+    for t in self.tokens:
+      print(t)
+    
   # has the input more tokens to process
   def hasMoreTokens(self): 
     return len(self.tokens) > 0
@@ -49,7 +59,7 @@ class JackTokenizer:
     
   # returns the type of the current process token 
   def tokenType(self):
-    return symbols[self.token]
+    return symbolList[self.token]
     
   # returns the keyword which is the current token
   #   only called when tokenType is KEYWORD
