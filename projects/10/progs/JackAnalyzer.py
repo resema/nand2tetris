@@ -57,6 +57,9 @@ if __name__ == "__main__":
     
     tknzr = JackTokenizer.JackTokenizer(fobj_in)
     tknzr.tokenize();
+    
+    while (tknzr.hasMoreTokens()):
+      tknzr.advance()
   
   fobj_in.close()
   fobj_out.close()

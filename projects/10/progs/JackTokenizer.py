@@ -25,6 +25,7 @@ class JackTokenizer:
     self.rawlines = []
     self.tokens = []
     self.token = ""
+    self.next = ""
     
     for line in self.fobj_in:
       newline = re.sub("\s*//.*?\n", "", line) # remove comments
@@ -37,15 +38,13 @@ class JackTokenizer:
   # tokenizes the input file
   def tokenize(self):
     list = []
-    for line in self.rawlines:
-      list = line.split(" ");
+    for line in self.rawlines:  
+      list = re.split("(\W)", line);
       for l in list:
-        list2 = l.split(".");
-        for l in list2:
           if l != "":
             self.tokens.insert(len(self.tokens), l)
-    for t in self.tokens:
-      print(t)
+    # for t in self.tokens:
+      # print(t)
     
   # has the input more tokens to process
   def hasMoreTokens(self): 
@@ -56,6 +55,14 @@ class JackTokenizer:
   # groups inputs into tokens
   def advance(self):
     self.token = self.tokens.pop(0)
+    if (len(self.tokens)):
+      self.next = self.tokens[0]
+    if (self.token == ('\"')):
+      tmp = ""
+      while(self.next != ('\"')):
+        self.token = self.next = self.tokens.pop(0)
+        tmp += self.next
+      self.token = tmp
     
   # returns the type of the current process token 
   def tokenType(self):
