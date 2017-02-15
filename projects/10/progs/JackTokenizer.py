@@ -26,6 +26,7 @@ class JackTokenizer:
     self.tokens = []
     self.token = ""
     self.next = ""
+    self.type = -1
     
     for line in self.fobj_in:
       newline = re.sub("\s*//.*?\n", "", line) # remove comments
@@ -58,15 +59,32 @@ class JackTokenizer:
     if (len(self.tokens)):
       self.next = self.tokens[0]
     if (self.token == ('\"')):
-      tmp = ""
+      tmp = self.token
       while(self.next != ('\"')):
         self.token = self.next = self.tokens.pop(0)
         tmp += self.next
       self.token = tmp
+      # print(tmp)
     
   # returns the type of the current process token 
   def tokenType(self):
-    return symbolList[self.token]
+    if self.token in symbolList:
+      self.type = T_SYMBOL
+      return symbolList[self.token]
+    elif self.token in keywordList:
+      self.type = T_KEYWORD
+      return keywordList[self.token]
+    elif re.match("\".*\"", self.token):
+      str = re.sub("\"", "", self.token);
+      self.type = T_STRING_CONST
+      # print(str)
+      return T_STRING_CONST
+    elif re.match("\d", self.token):
+      self.type = T_INT_CONST
+      return T_INT_CONST
+    elif re.match("_?([a-z]|[A-Z])(_|[a-z]|[A-Z]|\d)*", self.token):
+      self.type = T_IDENTIFIER
+      return T_IDENTIFIER
     
   # returns the keyword which is the current token
   #   only called when tokenType is KEYWORD

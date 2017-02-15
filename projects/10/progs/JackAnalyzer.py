@@ -60,6 +60,8 @@ if __name__ == "__main__":
     
     while (tknzr.hasMoreTokens()):
       tknzr.advance()
+      type = tknzr.tokenType()
+      
   
   fobj_in.close()
   fobj_out.close()

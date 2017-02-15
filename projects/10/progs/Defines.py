@@ -12,11 +12,11 @@
 
 # Token types
 
-# T_KEYWORD         = 0
-# T_SYMBOL          = 1
-# T_IDENTIFIER      = 2
-# T_INT_CONST       = 3
-# T_STRING_CONST    = 4
+T_KEYWORD         = 100
+T_SYMBOL          = 101
+T_IDENTIFIER      = 102
+T_INT_CONST       = 103
+T_STRING_CONST    = 104
 
 
 # Keywords types
