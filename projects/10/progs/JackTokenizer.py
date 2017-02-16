@@ -58,58 +58,70 @@ class JackTokenizer:
     self.token = self.tokens.pop(0)
     if (len(self.tokens)):
       self.next = self.tokens[0]
-    if (self.token == ('\"')):
+    if (self.token == ('\"')):  # combine the splitted string parts
       tmp = self.token
       while(self.next != ('\"')):
         self.token = self.next = self.tokens.pop(0)
         tmp += self.next
       self.token = tmp
-      # print(tmp)
+    if self.token == " ":       # remove recursely the empty lines
+      self.advance()
     
   # returns the type of the current process token 
   def tokenType(self):
+    # is it a symbol
     if self.token in symbolList:
       self.type = T_SYMBOL
-      return symbolList[self.token]
+    # is it a keyword
     elif self.token in keywordList:
       self.type = T_KEYWORD
-      return keywordList[self.token]
+    # is it a string
     elif re.match("\".*\"", self.token):
       str = re.sub("\"", "", self.token);
+      self.token = str    # removes the " from the string
       self.type = T_STRING_CONST
-      # print(str)
-      return T_STRING_CONST
+    # is it a integer
     elif re.match("\d", self.token):
       self.type = T_INT_CONST
-      return T_INT_CONST
+    # is it an identifier
     elif re.match("_?([a-z]|[A-Z])(_|[a-z]|[A-Z]|\d)*", self.token):
       self.type = T_IDENTIFIER
-      return T_IDENTIFIER
+    return self.type
     
   # returns the keyword which is the current token
   #   only called when tokenType is KEYWORD
   def keyWord(self):
-    pass
+    if self.type != T_KEYWORD:
+      raise TypeError("Error: Keyword expected: " + self.type)
+    return self.token
     
   # returns the character which is the current token
   #   only called when tokenType is SYMBOL
   def symbol(self):
-    pass
+    if self.type != T_SYMBOL:
+      raise TypeError("Error: Symbol expected: " + self.type)
+    return self.token
     
   # returns the identifier which is the current token
   #   only called when tokenType is IDENTIFIER
   def identifier(self):
-    pass
+    if self.type != T_IDENTIFIER:
+      raise TypeError("Error: Identifier expected: " + self.type)
+    return self.token
      
   # returns the integer of the current token
   #   only called when tokenType is INT_ONST
   def intVal(self):
-    pass
+    if self.type != T_INT_CONST:
+      raise TypeError("Error: Integer expected: " + self.type)
+    return self.token
     
   # returns the string value of the current token
   #   only called when tokenType is STRING_CONST
   def stringVal(self):
-    pass
+    if self.type != T_STRING_CONST:
+      raise TypeError("Error: String expected: " + self.type)
+    return self.token
     
     
     

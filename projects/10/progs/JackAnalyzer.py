@@ -20,6 +20,8 @@ import os
 
 import JackTokenizer, CompilationEngine
 
+from Defines import *
+
 
 # ******************
 # MAIN
@@ -61,6 +63,21 @@ if __name__ == "__main__":
     while (tknzr.hasMoreTokens()):
       tknzr.advance()
       type = tknzr.tokenType()
+      try:
+        if type == T_KEYWORD:
+          token = tknzr.keyWord()
+        elif type == T_SYMBOL:
+          token = tknzr.symbol()
+        elif type == T_IDENTIFIER:
+          token = tknzr.identifier()
+        elif type == T_INT_CONST:
+          token = tknzr.intVal()
+        elif type == T_STRING_CONST:
+          token = tknzr.stringVal()
+      except TypeError as err:
+        print("Handling TypeError:", err)
+        
+      print(token)
       
   
   fobj_in.close()
