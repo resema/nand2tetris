@@ -82,5 +82,5 @@ class CompilationEngine:
     pass
     
   # Compiles a return statemetn
-  def compieReturn(self):
+  def compileReturn(self):
     pass
