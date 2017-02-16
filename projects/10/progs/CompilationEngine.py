@@ -10,16 +10,36 @@
 #
 #***********************************************************
 
+from Defines import *
+
 class CompilationEngine:
 
   # Creates a new compilation engine
-  def __init__(self, fobj_in, fobj_out):
-    self.fobj_in = fobj_in
+  def __init__(self, listOfTokens, fobj_out):
+    self.listOfTokens = listOfTokens
     self.fobj_out = fobj_out
+    self.token = ""
+    
+  def run(self):
+    while (len(self.listOfTokens) > 0):
+      self.token = self.listOfTokens.pop(0)
+      if self.token == "class":
+        self.CompileClass()
     
   # Compiles a complete class
   def CompileClass(self):
-    pass
+    tree = self.head("class")
+    tree += self.newline()
+    self.token = self.next()
+    # if not self.checkSymbol(self.token):
+      # raise Exception("class opening bracket missing")
+      
+    self.token = self.next()
+    # if not self.checkSymbol(self.token):
+      # raise Exception("class closing bracket missing")
+    tree += self.tail("class")
+    
+    self.fobj_out.write(tree)
     
   # Compiles a static variable declaration of a field declaration
   def CompileClassVarDec(self):
@@ -84,3 +104,31 @@ class CompilationEngine:
   # Compiles a return statemetn
   def compileReturn(self):
     pass
+    
+    
+  #.................................................
+  # next token from listOfTokens
+  def next(self):
+    if (len(self.listOfTokens) > 0):
+      ret = self.listOfTokens.pop(0)
+    else:
+      ret = null
+    return ret
+  
+  # check token
+  def checkSymbol(self, tkn):
+    for name, tag in symbolList.items():
+      if name is tkn:
+        return True
+      else:
+        return False
+  
+  # helpers for xml tags
+  def head(self, str):
+    return "<" + str + ">"
+    
+  def tail(self, str):
+    return "</" + str + ">"
+    
+  def newline(self):
+    return "\n"

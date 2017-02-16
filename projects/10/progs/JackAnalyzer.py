@@ -60,25 +60,26 @@ if __name__ == "__main__":
     tknzr = JackTokenizer.JackTokenizer(fobj_in)
     tknzr.tokenize();
     
+    listOfTokens = []
     while (tknzr.hasMoreTokens()):
       tknzr.advance()
       type = tknzr.tokenType()
       try:
         if type == T_KEYWORD:
-          token = tknzr.keyWord()
+          listOfTokens.insert(len(listOfTokens), tknzr.keyWord())
         elif type == T_SYMBOL:
-          token = tknzr.symbol()
+          listOfTokens.insert(len(listOfTokens), tknzr.symbol())
         elif type == T_IDENTIFIER:
-          token = tknzr.identifier()
+          listOfTokens.insert(len(listOfTokens), tknzr.identifier())
         elif type == T_INT_CONST:
-          token = tknzr.intVal()
+          listOfTokens.insert(len(listOfTokens), tknzr.intVal())
         elif type == T_STRING_CONST:
-          token = tknzr.stringVal()
+          listOfTokens.insert(len(listOfTokens), tknzr.stringVal())
       except TypeError as err:
         print("Handling TypeError:", err)
         
-      print(token)
-      
+    engine = CompilationEngine.CompilationEngine(listOfTokens, fobj_out)
+    engine.run()
   
   fobj_in.close()
   fobj_out.close()
