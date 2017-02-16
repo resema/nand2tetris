@@ -29,12 +29,12 @@ class CompilationEngine:
   # Compiles a complete class
   def CompileClass(self):
     tree = self.head("class")
-    tree += self.newline()
-    self.token = self.next()
+    # tree += self.newline()
+    # self.token = self.next()
     # if not self.checkSymbol(self.token):
       # raise Exception("class opening bracket missing")
       
-    self.token = self.next()
+    # self.token = self.next()
     # if not self.checkSymbol(self.token):
       # raise Exception("class closing bracket missing")
     tree += self.tail("class")
