@@ -19,6 +19,8 @@ class CompilationEngine:
     self.listOfTokens = listOfTokens
     self.fobj_out = fobj_out
     self.token = ""
+    self.depth = 0
+    self.tree = ""
     
   def run(self):
     while (len(self.listOfTokens) > 0):
@@ -30,24 +32,27 @@ class CompilationEngine:
   # Compiles a complete class
   def CompileClass(self):
     classHead = self.token
-    tree = self.head(classHead[1])
-    tree += self.newline()
-    tree += self.tagAsXml(self.token[0], self.token[1])
+    self.tree += self.head(classHead[1])
+    self.depth += 1
+    self.tree += self.newline()
+    self.tree += self.tagAsXml(self.token)
     self.token = self.next()
     if self.token[0] != T_IDENTIFIER:
       raise Exception("class name missing")
-    tree += self.tagAsXml(self.token[0], self.token[1])
+    self.tree += self.tagAsXml(self.token)
     self.token = self.next()
-    # if not self.checkSymbol(self.token):
-    if self.token[0] != T_SYMBOL and self.token[1] != S_OCURLYBRACKETS:
-      raise Exception("class opening bracket missing: " + self.token[1])
-      
-    # self.token = self.next()
-    # if not self.checkSymbol(self.token):
-      # raise Exception("class closing bracket missing")
-    tree += self.tail(classHead[1])
+    self.openCurlyBracket(self.token)
     
-    self.fobj_out.write(tree)
+    while (len(self.listOfTokens) > 1):    # leave closing bracket to the class implementation
+      self.token = self.next()
+      if self.token[0] == T_KEYWORD:
+        if self.token[1] == K_CONSTRUCTOR or self.token[1] == K_FUNCTION:
+          self.CompileSubroutineDec()
+
+    self.closeCurlyBracket(self.token)
+    self.tree += self.tail(classHead[1])
+    
+    self.fobj_out.write(self.tree)
     
   # Compiles a static variable declaration of a field declaration
   def CompileClassVarDec(self):
@@ -55,7 +60,33 @@ class CompilationEngine:
     
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
-    pass
+    subroutineDec = "subroutineDec"
+    self.tree += self.head(subroutineDec, self.depth)
+    self.depth += 1
+    self.tree += self.newline()
+    self.tree += self.tagAsXml(self.token)
+    self.token = self.next()
+    if self.token[0] != T_KEYWORD:
+      raise Exception("subroutine keyword missing: " + self.token[1])
+    self.tree += self.tagAsXml(self.token)
+    self.token = self.next()
+    if self.token[0] != T_IDENTIFIER:
+      raise Exception("subroutine identifier missing: " + self.token[1])
+    self.tree += self.tagAsXml(self.token)
+    self.token = self.next()
+    if self.token[0] != T_SYMBOL and self.token[1] == S_OBRACKETS:
+      raise Exception("subroutine opening bracket is missing: " + self.token[1])
+    self.tree += self.tagAsXml(self.token)
+    self.token = self.next()
+    if self.token[0] != T_SYMBOL and self.token[1] == S_CBRACKETS:
+      raise Exception("subroutine closing bracket is missing: " + self.token[1])
+    self.tree += self.tagAsXml(self.token)
+    self.token = self.next()
+    self.openCurlyBracket(self.token)
+    self.compileSubroutineBody()
+    
+    self.closeCurlyBracket(self.token)
+    self.tree += self.tail(subroutineDec, self.depth)
     
   # Compiles an expression
   def CompileExpression(self):
@@ -113,6 +144,18 @@ class CompilationEngine:
   def compileReturn(self):
     pass
     
+  # Compile open curly brackets
+  def openCurlyBracket(self, token):
+    if self.token[0] != T_SYMBOL and self.token[1] != S_OCURLYBRACKETS:
+      raise Exception("opening curly bracket missing: " + self.token[1])
+    self.tree += self.tagAsXml(self.token)
+
+  # Compile close curly brackets
+  def closeCurlyBracket(self, token):
+    if self.token[0] != T_SYMBOL and self.token[1] != S_CCURLYBRACKETS:
+      raise Exception("closing curly bracket missing: " + self.token[1])
+    self.tree += self.tagAsXml(self.token)
+    self.depth -= 1
     
   #.................................................
   # next token from listOfTokens
@@ -123,23 +166,27 @@ class CompilationEngine:
       ret = null
     return ret
   
-  # check token
-  def checkSymbol(self, tkn):
-    for name, tag in symbolList.items():
-      if name is tkn:
-        return True
-      else:
-        return False
-  
   # helpers for xml tags
-  def head(self, str):
-    return "<" + str + ">"
+  def head(self, str, depth=0):
+    ret = ""
+    for i in range(depth):
+      ret += "\t"
+    ret += "<" + str + ">"
+    return ret
     
-  def tail(self, str):
-    return "</" + str + ">"
+  def tail(self, str, depth=0):
+    ret = ""
+    for i in range(depth):
+      ret += "\t"
+    ret += "</" + str + ">\n" 
+    return ret
     
-  def tagAsXml(self, type, token):
-    return self.head(type) + token + self.tail(type) + "\n"
+  def tagAsXml(self, token):
+    ret = ""
+    for i in range(self.depth):
+      ret += "\t"
+    ret += self.head(token[0]) + token[1] + self.tail(token[0])
+    return ret
     
   def newline(self):
     return "\n"

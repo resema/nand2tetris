@@ -77,7 +77,9 @@ if __name__ == "__main__":
           listOfTokens.insert(len(listOfTokens), tknzr.stringVal())
       except TypeError as err:
         print("Handling TypeError:", err)
-        
+    
+    # print(listOfTokens)
+    
     engine = CompilationEngine.CompilationEngine(listOfTokens, fobj_out)
     engine.run()
   

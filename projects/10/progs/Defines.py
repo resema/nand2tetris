@@ -22,16 +22,16 @@ T_STRING_CONST    = "stringConstant"
 # Keywords types
 
 K_CLASS       = "class"
-K_CONSTRUCTOR = 2
-K_FUNCTION    = 3
+K_CONSTRUCTOR = "constructor"
+K_FUNCTION    = "function"
 K_METHOD      = 4
 K_FIELD       = 5
 K_STATIC      = 6
 K_VAR         = 7
-K_INT         = 8
-K_CHAR        = 9
-K_BOOLEAN     = 10
-K_VOID        = 11
+K_INT         = "int"
+K_CHAR        = "char"
+K_BOOLEAN     = "boolean"
+K_VOID        = "void"
 K_TRUE        = 12
 K_FALSE       = 13
 K_NULL        = 14
@@ -72,11 +72,11 @@ keywordList = {
 # Sybmols
 
 S_OCURLYBRACKETS  = "{"
-S_CCURLYBRACKETS  = 23
-S_OANGLEBRACKETS  = 24
-S_CANGLEBRACKETS  = 25
-S_OBRACKETS       = 26
-S_CBRACKETS       = 27
+S_CCURLYBRACKETS  = "}"
+S_OANGLEBRACKETS  = "["
+S_CANGLEBRACKETS  = "]"
+S_OBRACKETS       = "("
+S_CBRACKETS       = ")"
 S_POINT           = 28
 S_KOMMA           = 29
 S_SEMICOLON       = 30
