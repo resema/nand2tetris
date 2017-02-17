@@ -12,16 +12,16 @@
 
 # Token types
 
-T_KEYWORD         = 100
-T_SYMBOL          = 101
-T_IDENTIFIER      = 102
-T_INT_CONST       = 103
-T_STRING_CONST    = 104
+T_KEYWORD         = "keyword"
+T_SYMBOL          = "symbol"
+T_IDENTIFIER      = "identifier"
+T_INT_CONST       = "integerConstant"
+T_STRING_CONST    = "stringConstant"
 
 
 # Keywords types
 
-K_CLASS       = 1
+K_CLASS       = "class"
 K_CONSTRUCTOR = 2
 K_FUNCTION    = 3
 K_METHOD      = 4
@@ -71,7 +71,7 @@ keywordList = {
 
 # Sybmols
 
-S_OCURLYBRACKETS  = 22
+S_OCURLYBRACKETS  = "{"
 S_CCURLYBRACKETS  = 23
 S_OANGLEBRACKETS  = 24
 S_CANGLEBRACKETS  = 25

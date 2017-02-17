@@ -23,21 +23,29 @@ class CompilationEngine:
   def run(self):
     while (len(self.listOfTokens) > 0):
       self.token = self.listOfTokens.pop(0)
-      if self.token == "class":
-        self.CompileClass()
+      if self.token[0] == T_KEYWORD:
+        if self.token[1] == K_CLASS:
+          self.CompileClass()
     
   # Compiles a complete class
   def CompileClass(self):
-    tree = self.head("class")
-    # tree += self.newline()
-    # self.token = self.next()
+    classHead = self.token
+    tree = self.head(classHead[1])
+    tree += self.newline()
+    tree += self.tagAsXml(self.token[0], self.token[1])
+    self.token = self.next()
+    if self.token[0] != T_IDENTIFIER:
+      raise Exception("class name missing")
+    tree += self.tagAsXml(self.token[0], self.token[1])
+    self.token = self.next()
     # if not self.checkSymbol(self.token):
-      # raise Exception("class opening bracket missing")
+    if self.token[0] != T_SYMBOL and self.token[1] != S_OCURLYBRACKETS:
+      raise Exception("class opening bracket missing: " + self.token[1])
       
     # self.token = self.next()
     # if not self.checkSymbol(self.token):
       # raise Exception("class closing bracket missing")
-    tree += self.tail("class")
+    tree += self.tail(classHead[1])
     
     self.fobj_out.write(tree)
     
@@ -50,7 +58,7 @@ class CompilationEngine:
     pass
     
   # Compiles an expression
-  def CompileExression(self):
+  def CompileExpression(self):
     pass
     
   # Compiles a term
@@ -129,6 +137,9 @@ class CompilationEngine:
     
   def tail(self, str):
     return "</" + str + ">"
+    
+  def tagAsXml(self, type, token):
+    return self.head(type) + token + self.tail(type) + "\n"
     
   def newline(self):
     return "\n"

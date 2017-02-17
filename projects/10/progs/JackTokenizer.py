@@ -91,37 +91,55 @@ class JackTokenizer:
   # returns the keyword which is the current token
   #   only called when tokenType is KEYWORD
   def keyWord(self):
-    if self.type != T_KEYWORD:
+    if self.type == T_KEYWORD:
+      xml = self.tagAsXML(self.type, self.token)
+    else:
       raise TypeError("Error: Keyword expected: " + self.type)
-    return self.token
+    return [self.type, self.token]
     
   # returns the character which is the current token
   #   only called when tokenType is SYMBOL
   def symbol(self):
-    if self.type != T_SYMBOL:
+    if self.type == T_SYMBOL:
+      xml = self.tagAsXML(self.type, self.token)
+    else:
       raise TypeError("Error: Symbol expected: " + self.type)
-    return self.token
+    return [self.type, self.token]
     
   # returns the identifier which is the current token
   #   only called when tokenType is IDENTIFIER
   def identifier(self):
-    if self.type != T_IDENTIFIER:
+    if self.type == T_IDENTIFIER:
+      xml = self.tagAsXML(self.type, self.token)
+    else:
       raise TypeError("Error: Identifier expected: " + self.type)
-    return self.token
+    return [self.type, self.token]
      
   # returns the integer of the current token
   #   only called when tokenType is INT_ONST
   def intVal(self):
-    if self.type != T_INT_CONST:
+    if self.type == T_INT_CONST:
+      xml = self.tagAsXML(self.type, self.token)
+    else:
       raise TypeError("Error: Integer expected: " + self.type)
-    return self.token
+    return [self.type, self.token]
     
   # returns the string value of the current token
   #   only called when tokenType is STRING_CONST
   def stringVal(self):
-    if self.type != T_STRING_CONST:
+    if self.type == T_STRING_CONST:
+      xml = self.tagAsXML(self.type, self.token)
+    else:
       raise TypeError("Error: String expected: " + self.type)
-    return self.token
+    return [self.type, self.token]
     
+  #..............................................................
+  # helpers for xml tags
+  def head(self, str):
+    return "<" + str + ">"
     
+  def tail(self, str):
+    return "</" + str + ">"
     
+  def tagAsXML(self, type, token):
+    return self.head(self.type) + self.token + self.tail(self.type)
