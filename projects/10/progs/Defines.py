@@ -24,7 +24,7 @@ T_STRING_CONST    = "stringConstant"
 K_CLASS       = "class"
 K_CONSTRUCTOR = "constructor"
 K_FUNCTION    = "function"
-K_METHOD      = 4
+K_METHOD      = "method"
 K_FIELD       = 5
 K_STATIC      = 6
 K_VAR         = 7
@@ -36,7 +36,7 @@ K_TRUE        = 12
 K_FALSE       = 13
 K_NULL        = 14
 K_THIS        = 15
-K_LET         = 16
+K_LET         = "let"
 K_DO          = 17
 K_IF          = 18
 K_ELSE        = 19
@@ -88,7 +88,7 @@ S_AMPERSAND       = 35
 S_PIPE            = 36
 S_LESSTHAN        = 37
 S_GREATERTHAN     = 38
-S_EQUALS          = 39
+S_EQUALS          = "="
 S_TILDE           = 40 
 
 # symbol list
