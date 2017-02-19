@@ -84,15 +84,21 @@ class CompilationEngine:
     self.depth -= 1
     self.tail(subroutineDec, self.depth)
     
-  # Compiles an expression
+  # Compiles an expression and returns a semicolon as token
   def CompileExpression(self):
     expression = "expression"
     self.head(expression, self.depth)
     self.depth += 1
     self.newline()
-    
     self.CompileTerm()
-    
+    self.next()
+    while (self.token[1] != S_SEMICOLON):     # TODO: earlier exit needed?
+      if self.token[0] == T_SYMBOL:
+        if self.token[1] != (S_PLUS or S_MINUS or S_STAR or S_SLASH or S_AMPERSAND 
+                             or S_PIPE or S_LESSTHAN or S_GREATERTHAN or S_EQUALS):
+          raise Exception("expression op missing: " + self.token[1])
+      self.next()
+      self.CompileTerm()
     self.depth -= 1
     self.tail(expression, self.depth)
     
@@ -108,16 +114,38 @@ class CompilationEngine:
     self.depth += 1
     self.newline()
     self.tagAsXml(self.token)
-    
-    # Term
-    
+    self.next()
+    if self.token[0] == (T_INT_CONST or T_STRING_CONST):
+      self.tagAsXml(self.token)
+    elif self.token[0] == T_IDENTIFIER:
+      if self.token[0] == T_SYMBOL:             # angle bracket
+        if self.token[1] == S_OANGLEBRACKETS:
+          self.tagAsXml(self.token)
+          self.next()
+          self.CompileExpression()    # expression
+          self.next()
+          if self.token[1] != S_CANGLEBRACKETS:
+            raise Exception("letStatement closing angle bracket missing: " + self.token[1])
+          self.tagAsXml(self.token)
+          self.next()
+        elif self.token[1] == S_POINT:          # subroutine call
+          self.tagAsXml(self.token)
+          self.next()
+          if self.token[0] != T_IDENTIFIER:
+            raise Exception("subroutine call missing identifier: " + self.token[1])
+          self.tagAsXm(self.token)
+          self.next
+          self.openBracket(self.token)
+          self.CompileExpressionList()
+          self.closeBracket(self.token)
+      
     self.depth -= 1
     self.tail(term, self.depth)
     
     
   # Compiles a comma-separated list of expressions
   def CompileExpressionList(self):
-    pass
+    self.next
    
   # Compiles a possible emtpy parameter list
   #   Does not handle the enclosing "()"
@@ -167,7 +195,7 @@ class CompilationEngine:
     if self.token[0] != T_IDENTIFIER:
       raise Exception("letStatement identifier missing: " + self.token[1])
     self.tagAsXml(self.token)
-    self.next()
+    self.next()    
     if self.token[0] == T_SYMBOL:
       if self.token[1] == S_OANGLEBRACKETS:
         self.tagAsXml(self.token)
@@ -182,7 +210,10 @@ class CompilationEngine:
       raise Exception("letStatement equal symbol missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.next()
-        
+    self.CompileExpression()        # expression
+    if self.token[1] != S_SEMICOLON:
+      raise Exception("letStatement semicolon missing: " + self.token[1])
+    self.tagAsXml(self.token)
     self.depth -= 1
     self.tail(letStatement, self.depth)
     
@@ -227,7 +258,8 @@ class CompilationEngine:
       raise Exception("closing curly bracket missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.depth -= 1
-    
+   
+   
   #.................................................
   # next token from listOfTokens
   def next(self):

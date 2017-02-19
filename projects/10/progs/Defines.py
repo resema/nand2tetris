@@ -77,17 +77,17 @@ S_OANGLEBRACKETS  = "["
 S_CANGLEBRACKETS  = "]"
 S_OBRACKETS       = "("
 S_CBRACKETS       = ")"
-S_POINT           = 28
+S_POINT           = "."
 S_KOMMA           = 29
-S_SEMICOLON       = 30
-S_PLUS            = 31
-S_MINUS           = 32
-S_STAR            = 33
-S_SLASH           = 34
-S_AMPERSAND       = 35
-S_PIPE            = 36
-S_LESSTHAN        = 37
-S_GREATERTHAN     = 38
+S_SEMICOLON       = ";"
+S_PLUS            = "+"
+S_MINUS           = "-"
+S_STAR            = "*"
+S_SLASH           = "/"
+S_AMPERSAND       = "&"
+S_PIPE            = "|"
+S_LESSTHAN        = "<"
+S_GREATERTHAN     = ">"
 S_EQUALS          = "="
 S_TILDE           = 40 
 
