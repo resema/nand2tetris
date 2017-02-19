@@ -92,13 +92,15 @@ class CompilationEngine:
     self.newline()
     self.CompileTerm()
     self.next()
-    while (self.token[1] != S_SEMICOLON):     # TODO: earlier exit needed?
+    while (self.token[1] != S_SEMICOLON):
       if self.token[0] == T_SYMBOL:
-        if self.token[1] != (S_PLUS or S_MINUS or S_STAR or S_SLASH or S_AMPERSAND 
-                             or S_PIPE or S_LESSTHAN or S_GREATERTHAN or S_EQUALS):
-          raise Exception("expression op missing: " + self.token[1])
-      self.next()
-      self.CompileTerm()
+        if (self.token[1] == S_PLUS or self.token[1] == S_MINUS or self.token[1] == S_STAR or
+           self.token[1] == S_SLASH or self.token[1] == S_AMPERSAND or self.token[1] == S_PIPE or
+           self.token[1] == S_LESSTHAN or self.token[1] == S_GREATERTHAN or self.token[1] == S_EQUALS):
+          self.tagAsXml(self.token)               # op 
+          self.next()
+        self.CompileTerm()                      # expression TODO: __MUST__ look ahead!!
+        self.next()
     self.depth -= 1
     self.tail(expression, self.depth)
     
@@ -110,38 +112,42 @@ class CompilationEngine:
   #   Any other token is not part of this term
   def CompileTerm(self):
     term = "term"
+    next = self.peek()
     self.head(term, self.depth)
     self.depth += 1
     self.newline()
-    self.tagAsXml(self.token)
-    self.next()
-    if self.token[0] == (T_INT_CONST or T_STRING_CONST):
+    # self.next()
+    if self.token[0] == T_INT_CONST or self.token[0] == T_STRING_CONST:
       self.tagAsXml(self.token)
     elif self.token[0] == T_IDENTIFIER:
-      if self.token[0] == T_SYMBOL:             # angle bracket
-        if self.token[1] == S_OANGLEBRACKETS:
-          self.tagAsXml(self.token)
-          self.next()
-          self.CompileExpression()    # expression
-          self.next()
-          if self.token[1] != S_CANGLEBRACKETS:
-            raise Exception("letStatement closing angle bracket missing: " + self.token[1])
-          self.tagAsXml(self.token)
-          self.next()
-        elif self.token[1] == S_POINT:          # subroutine call
-          self.tagAsXml(self.token)
-          self.next()
-          if self.token[0] != T_IDENTIFIER:
-            raise Exception("subroutine call missing identifier: " + self.token[1])
-          self.tagAsXm(self.token)
-          self.next
-          self.openBracket(self.token)
-          self.CompileExpressionList()
-          self.closeBracket(self.token)
+      self.tagAsXml(self.token)
+      if next[1] == S_OANGLEBRACKETS:
+        self.next()
+        self.tagAsXml(self.token)
+        
+        self.next()
+        self.tagAsXml(self.token)
+        self.next()
+
+        # self.CompileExpression()      # expression
+
+        if self.token[1] != S_CANGLEBRACKETS:
+          raise Exception("letStatement closing angle bracket missing: " + self.token[1])
+        self.tagAsXml(self.token)
+        # self.next()
+      elif self.token[1] == S_POINT:          # subroutine call
+        self.tagAsXml(self.token)
+        self.next()
+        if self.token[0] != T_IDENTIFIER:
+          raise Exception("subroutine call missing identifier: " + self.token[1])
+        self.tagAsXm(self.token)
+        self.next
+        self.openBracket(self.token)
+        self.CompileExpressionList()
+        self.closeBracket(self.token)
       
     self.depth -= 1
-    self.tail(term, self.depth)
-    
+    self.tail(term, self.depth)   
     
   # Compiles a comma-separated list of expressions
   def CompileExpressionList(self):
@@ -206,7 +212,7 @@ class CompilationEngine:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
         self.tagAsXml(self.token)
         self.next()
-    if self.token[1] != S_EQUALS:
+    if self.token[1] != S_EQUALS:   # equal sign
       raise Exception("letStatement equal symbol missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.next()
@@ -268,6 +274,14 @@ class CompilationEngine:
     else:
       ret = null
     self.token = ret
+  
+  # peek the next token from listofTokens
+  def peek(self):
+    if (len(self.listOfTokens) > 1):
+      ret = self.listOfTokens[0]
+    else:
+      ret = null
+    return ret
   
   # helpers for xml tags
   def head(self, str, depth=0):
