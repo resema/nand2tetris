@@ -41,7 +41,7 @@ class CompilationEngine:
       raise Exception("class name missing")
     self.tagAsXml(self.token)
     self.next()
-    self.openCurlyBracket(self.token)
+    self.openCurlyBracket()
     
     while (len(self.listOfTokens) > 1):    # leave closing bracket to the class implementation
       self.next()
@@ -50,8 +50,10 @@ class CompilationEngine:
           self.CompileSubroutineDec()     # subroutine declaration
         elif self.token[1] == K_LET:
           self.compileLet()
+        elif self.token[1] == K_VAR:
+          self.compileVarDec()
 
-    self.closeCurlyBracket(self.token)
+    self.closeCurlyBracket()
     self.tail(classHead[1])
     
     self.fobj_out.write(self.tree)
@@ -76,10 +78,10 @@ class CompilationEngine:
       raise Exception("subroutine identifier missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.next()
-    self.openBracket(self.token)  
+    self.openBracket()  
     self.compileParameterList()   # parameter list
     self.next()
-    self.closeBracket(self.token)
+    self.closeBracket()
     self.compileSubroutineBody()  # subroutine body
     self.depth -= 1
     self.tail(subroutineDec, self.depth)
@@ -135,10 +137,10 @@ class CompilationEngine:
           raise Exception("function identifier missing: " + self.token[1])
         self.tagAsXml(self.token)
         self.next()
-        self.openBracket(self.token)
+        self.openBracket()
         self.next()
         self.CompileExpressionList()
-        self.closeBracket(self.token)
+        self.closeBracket()
       
     self.depth -= 1
     self.tail(term, self.depth)   
@@ -173,19 +175,50 @@ class CompilationEngine:
     self.depth += 1
     self.newline()
     self.next()
-    self.openCurlyBracket(self.token)
+    self.openCurlyBracket()
     
     while (self.token[1] != S_CCURLYBRACKETS):
       self.next()
       if self.token[1] == K_LET:
-          self.compileLet()
+        self.compileLet()
+      elif self.token[1] == K_VAR:
+        self.compileVarDec()
 
-    self.closeCurlyBracket(self.token)
+    self.closeCurlyBracket()
     self.tail(subroutineBody, self.depth)
     
   # Compiles a var declaration
-  def comileVarDec(self):
-    pass
+  def compileVarDec(self):
+    varDec = "varDec"
+    self.head(varDec, self.depth)
+    self.depth += 1
+    self.newline()
+    self.tagAsXml(self.token)
+    self.next()
+    if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
+      self.tagAsXml(self.token)
+      self.next()
+    else:
+      raise Exception("varDec type missing: " + self.token[1])
+    if self.token[0] == T_IDENTIFIER:
+      self.tagAsXml(self.token)
+      self.next()
+    else:
+      raise Exception("varDec identifier missing: " + self.token[1])
+    while (self.token[1] != S_SEMICOLON):
+      if self.token[1] != S_KOMMA:
+        raise Exception("varDec initializer list komma missing: " + self.token[1])
+      self.tagAsXml(self.token)
+      self.next()
+      if self.token[0] != T_IDENTIFIER:
+        raise Exception("varDec identifier missing: " + self.token[1])
+      self.tagAsXml(self.token)
+      self.next()
+    if self.token[1] != S_SEMICOLON:
+      raise Exception("letStatement semicolon missing: " + self.token[1])
+    self.tagAsXml(self.token)
+    self.depth -= 1
+    self.tail(varDec, self.depth)
     
   # Compiles a sequence of statements
   #    Does not handle the enclosing "{}"
@@ -240,27 +273,31 @@ class CompilationEngine:
   # Compiles a return statemetn
   def compileReturn(self):
     pass
-    
+ 
+ 
+  #.................................................
+  # compilation helps
+   
   # Compile opening bracket
-  def openBracket(self, token):
+  def openBracket(self):
     if self.token[1] != S_OBRACKETS:
       raise Exception("subroutine opening bracket is missing: " + self.token[1])
     self.tagAsXml(self.token)
    
   # Compile clsing bracket
-  def closeBracket(self, token):
+  def closeBracket(self):
     if self.token[1] != S_CBRACKETS:
       raise Exception("subroutine closing bracket is missing: " + self.token[1])
     self.tagAsXml(self.token)
     
   # Compile open curly brackets
-  def openCurlyBracket(self, token):
+  def openCurlyBracket(self):
     if self.token[0] != T_SYMBOL and self.token[1] != S_OCURLYBRACKETS:
       raise Exception("opening curly bracket missing: " + self.token[1])
     self.tagAsXml(self.token)
 
   # Compile close curly brackets
-  def closeCurlyBracket(self, token):
+  def closeCurlyBracket(self):
     if self.token[0] != T_SYMBOL and self.token[1] != S_CCURLYBRACKETS:
       raise Exception("closing curly bracket missing: " + self.token[1])
     self.tagAsXml(self.token)
