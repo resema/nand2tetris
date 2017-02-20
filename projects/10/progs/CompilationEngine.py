@@ -149,7 +149,7 @@ class CompilationEngine:
     self.head(expressionList, self.depth)
     self.depth += 1
     self.newline()
-    if self.token[0] == T_IDENTIFIER:
+    if self.token[0] == T_IDENTIFIER or self.token[0] == T_STRING_CONST or self.token[0] == T_INT_CONST:
       self.tagAsXml(self.token)
       self.next()
     self.depth -= 1
@@ -209,7 +209,6 @@ class CompilationEngine:
         self.tagAsXml(self.token)
         self.next()
         self.CompileExpression()    # expression
-        self.next()
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
         self.tagAsXml(self.token)
