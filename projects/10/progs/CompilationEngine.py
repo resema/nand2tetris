@@ -92,15 +92,14 @@ class CompilationEngine:
     self.newline()
     self.CompileTerm()
     self.next()
-    while (self.token[1] != S_SEMICOLON):
-      if self.token[0] == T_SYMBOL:
-        if (self.token[1] == S_PLUS or self.token[1] == S_MINUS or self.token[1] == S_STAR or
+    while (self.token[1] == S_PLUS or self.token[1] == S_MINUS or self.token[1] == S_STAR or
            self.token[1] == S_SLASH or self.token[1] == S_AMPERSAND or self.token[1] == S_PIPE or
            self.token[1] == S_LESSTHAN or self.token[1] == S_GREATERTHAN or self.token[1] == S_EQUALS):
-          self.tagAsXml(self.token)               # op 
-          self.next()
-        self.CompileTerm()                      # expression TODO: __MUST__ look ahead!!
+      if self.token[0] == T_SYMBOL:
+        self.tagAsXml(self.token)               # op 
         self.next()
+      self.CompileTerm()
+      self.next()
     self.depth -= 1
     self.tail(expression, self.depth)
     
@@ -116,33 +115,28 @@ class CompilationEngine:
     self.head(term, self.depth)
     self.depth += 1
     self.newline()
-    # self.next()
     if self.token[0] == T_INT_CONST or self.token[0] == T_STRING_CONST:
       self.tagAsXml(self.token)
     elif self.token[0] == T_IDENTIFIER:
       self.tagAsXml(self.token)
-      if next[1] == S_OANGLEBRACKETS:
-        self.next()
-        self.tagAsXml(self.token)
-        
+      if next[1] == S_OANGLEBRACKETS:   # array
         self.next()
         self.tagAsXml(self.token)
         self.next()
-
-        # self.CompileExpression()      # expression
-
+        self.CompileExpression()      # expression
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
         self.tagAsXml(self.token)
-        # self.next()
-      elif self.token[1] == S_POINT:          # subroutine call
+      elif next[1] == S_POINT:          # subroutine call
+        self.next()
         self.tagAsXml(self.token)
         self.next()
         if self.token[0] != T_IDENTIFIER:
-          raise Exception("subroutine call missing identifier: " + self.token[1])
-        self.tagAsXm(self.token)
-        self.next
+          raise Exception("function identifier missing: " + self.token[1])
+        self.tagAsXml(self.token)
+        self.next()
         self.openBracket(self.token)
+        self.next()
         self.CompileExpressionList()
         self.closeBracket(self.token)
       
@@ -151,7 +145,15 @@ class CompilationEngine:
     
   # Compiles a comma-separated list of expressions
   def CompileExpressionList(self):
-    self.next
+    expressionList = "expressionList"
+    self.head(expressionList, self.depth)
+    self.depth += 1
+    self.newline()
+    if self.token[0] == T_IDENTIFIER:
+      self.tagAsXml(self.token)
+      self.next()
+    self.depth -= 1
+    self.tail(expressionList, self.depth)
    
   # Compiles a possible emtpy parameter list
   #   Does not handle the enclosing "()"
@@ -242,13 +244,13 @@ class CompilationEngine:
     
   # Compile opening bracket
   def openBracket(self, token):
-    if self.token[0] != T_SYMBOL and self.token[1] == S_OBRACKETS:
+    if self.token[1] != S_OBRACKETS:
       raise Exception("subroutine opening bracket is missing: " + self.token[1])
     self.tagAsXml(self.token)
    
   # Compile clsing bracket
   def closeBracket(self, token):
-    if self.token[0] != T_SYMBOL and self.token[1] == S_CBRACKETS:
+    if self.token[1] != S_CBRACKETS:
       raise Exception("subroutine closing bracket is missing: " + self.token[1])
     self.tagAsXml(self.token)
     
