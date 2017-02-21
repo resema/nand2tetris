@@ -53,6 +53,8 @@ class CompilationEngine:
           self.compileLet()
         elif self.token[1] == K_VAR:
           self.compileVarDec()
+        elif self.token[1] == K_DO:
+          self.compileDo()
 
     self.closeCurlyBracket()
     self.tail(classHead[1])
@@ -161,13 +163,11 @@ class CompilationEngine:
     self.depth += 1
     self.newline()
     if self.token[1] != S_CBRACKETS:
-      self.tagAsXml(self.token)
-      self.next()
+      self.CompileExpression()
     while (self.token[1] == S_KOMMA):
       self.tagAsXml(self.token)
       self.next()
-      self.tagAsXml(self.token)
-      self.next()
+      self.CompileExpression()
     self.depth -= 1
     self.tail(expressionList, self.depth)
    
@@ -212,6 +212,8 @@ class CompilationEngine:
         self.compileLet()
       elif self.token[1] == K_VAR:
         self.compileVarDec()
+      elif self.token[1] == K_DO:
+        self.compileDo()
     self.closeCurlyBracket()
     self.tail(subroutineBody, self.depth)
     
@@ -303,12 +305,25 @@ class CompilationEngine:
     self.newline()
     self.tagAsXml(self.token)
     self.next()
-    # Idenifier not must-have...
-    # self.checkIdentifier("doStatement identifier missing")
-    # self.tagAsXml(self.token)
-    # self.next()
-
-    # TODO finish doStatement
+    self.checkIdentifier("doStatement identifier missing")
+    self.tagAsXml(self.token)
+    self.next()
+    if self.token[1] == S_POINT:
+      self.tagAsXml(self.token)
+      self.next()
+      self.checkIdentifier("doStatement subroutine identifier missing")
+      self.tagAsXml(self.token)
+      self.next()
+    self.openBracket()
+    self.next()
+    self.CompileExpressionList()
+    self.closeBracket()
+    self.next()
+    if self.token[1] != S_SEMICOLON:
+      raise Exception("doStetement semicolon missing: " + self.token[1])
+    self.tagAsXml(self.token)
+    self.depth -= 1
+    self.tail(doStatement, self.depth)
     
   # Compiles a return statemetn
   def compileReturn(self):
