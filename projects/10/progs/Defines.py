@@ -89,7 +89,7 @@ S_PIPE            = "|"
 S_LESSTHAN        = "<"
 S_GREATERTHAN     = ">"
 S_EQUALS          = "="
-S_TILDE           = 40 
+S_TILDE           = "~"
 
 # symbol list
 symbolList = { 

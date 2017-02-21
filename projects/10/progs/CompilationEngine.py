@@ -143,7 +143,15 @@ class CompilationEngine:
         self.next()
         self.CompileExpressionList()
         self.closeBracket()
-      
+    elif self.token[0] == T_SYMBOL:
+      if self.token[1] == S_MINUS or self.token[1] == S_TILDE:
+        self.tagAsXml(self.token)
+        self.next()
+        self.tagAsXml(self.token)
+      else:
+        raise Exception("unary op missing" + self.token[1])
+    else:
+      raise Exception("term not compilable: " + self.token[1])
     self.depth -= 1
     self.tail(term, self.depth)   
     
@@ -166,7 +174,7 @@ class CompilationEngine:
     self.head(parameterList, self.depth)
     self.depth += 1
     self.newline()
-    
+    # TODO missing list
     self.depth -= 1
     self.tail(parameterList, self.depth)
     
