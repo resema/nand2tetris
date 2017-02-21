@@ -40,7 +40,7 @@ K_LET         = "let"
 K_DO          = "do"
 K_IF          = 18
 K_ELSE        = 19
-K_WHILE       = 20
+K_WHILE       = "while"
 K_RETURN      = 21
 
 # Key word list
