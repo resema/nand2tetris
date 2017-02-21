@@ -37,8 +37,9 @@ class CompilationEngine:
     self.newline()
     self.tagAsXml(self.token)
     self.next()
-    if self.token[0] != T_IDENTIFIER:
-      raise Exception("class name missing")
+    self.checkIdentifier("class name missing")
+    # if self.token[0] != T_IDENTIFIER:
+      # raise Exception("class name missing")
     self.tagAsXml(self.token)
     self.next()
     self.openCurlyBracket()
@@ -74,8 +75,9 @@ class CompilationEngine:
       raise Exception("subroutine keyword missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.next()
-    if self.token[0] != T_IDENTIFIER:
-      raise Exception("subroutine identifier missing: " + self.token[1])
+    self.checkIdentifier("subroutine identifier missing")
+    # if self.token[0] != T_IDENTIFIER:
+      # raise Exception("subroutine identifier missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.next()
     self.openBracket()  
@@ -233,8 +235,9 @@ class CompilationEngine:
     self.newline()
     self.tagAsXml(self.token)
     self.next()
-    if self.token[0] != T_IDENTIFIER:
-      raise Exception("letStatement identifier missing: " + self.token[1])
+    self.checkIdentifier("letStatement identifier missing")
+    # if self.token[0] != T_IDENTIFIER:
+      # raise Exception("letStatement identifier missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.next()    
     if self.token[0] == T_SYMBOL:
@@ -268,7 +271,13 @@ class CompilationEngine:
     
   # Compiles a do statement
   def compileDo(self):
-    pass
+    doStatement = "doStatement"
+    self.head(doStatement, self.depth)
+    self.depth += 1
+    self.newline()
+    self.tagAsXml(self.token)
+    self.next()
+    self.checkIdentifier("doStatement identifier missing")
     
   # Compiles a return statemetn
   def compileReturn(self):
@@ -277,6 +286,11 @@ class CompilationEngine:
  
   #.................................................
   # compilation helps
+   
+  # check for identifier
+  def checkIdentifier(self, exception):
+    if self.token[0] != T_IDENTIFIER:
+      raise Exception(exception + ": " + self.token[1])
    
   # Compile opening bracket
   def openBracket(self):
