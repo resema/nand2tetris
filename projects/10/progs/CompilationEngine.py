@@ -160,10 +160,14 @@ class CompilationEngine:
     self.head(expressionList, self.depth)
     self.depth += 1
     self.newline()
-    if self.token[0] == T_IDENTIFIER or self.token[0] == T_STRING_CONST or self.token[0] == T_INT_CONST:
+    if self.token[1] != S_CBRACKETS:
       self.tagAsXml(self.token)
       self.next()
-      # while
+    while (self.token[1] == S_KOMMA):
+      self.tagAsXml(self.token)
+      self.next()
+      self.tagAsXml(self.token)
+      self.next()
     self.depth -= 1
     self.tail(expressionList, self.depth)
    
@@ -178,7 +182,7 @@ class CompilationEngine:
     if self.token[1] != S_CBRACKETS:
       self.tagAsXml(self.token)
       self.next()
-      self.checkIdentifier("parameterList identifier missing")
+      self.checkIdentifier("parameterList first identifier missing")
       self.tagAsXml(self.token)
       self.next()
     while (self.token[1] == S_KOMMA):
