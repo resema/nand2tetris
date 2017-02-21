@@ -47,14 +47,6 @@ class CompilationEngine:
       if self.token[0] == T_KEYWORD:
         if self.token[1] == K_CONSTRUCTOR or self.token[1] == K_FUNCTION or self.token[1] == K_METHOD:
           self.CompileSubroutineDec()     # subroutine declaration
-        else:
-          self.compileStatements()
-        # elif self.token[1] == K_LET:
-          # self.compileLet()
-        # elif self.token[1] == K_VAR:
-          # self.compileVarDec()
-        # elif self.token[1] == K_DO:
-          # self.compileDo()
     self.closeCurlyBracket("class")
     self.tail(classHead[1])
     self.fobj_out.write(self.tree)
@@ -203,9 +195,13 @@ class CompilationEngine:
     self.newline()
     self.next()
     self.openCurlyBracket("subroutine body")   
-    while (self.token[1] != S_CCURLYBRACKETS):
-      self.compileStatements()
-      self.next()
+    self.next()
+    while (self.token[1] == K_VAR):
+        self.compileVarDec()
+        self.next()
+    # while (self.token[1] != S_CCURLYBRACKETS):
+    self.compileStatements()
+      # self.next()
       # if self.token[1] == K_LET:
         # self.compileLet()
       # elif self.token[1] == K_VAR:
@@ -251,14 +247,23 @@ class CompilationEngine:
   # Compiles a sequence of statements
   #    Does not handle the enclosing "{}"
   def compileStatements(self):
-    if self.token[1] == K_LET:
-      self.compileLet()
-    elif self.token[1] == K_VAR:
-      self.compileVarDec()
-    elif self.token[1] == K_DO:
-      self.compileDo()
-    elif self.token[1] == K_WHILE:
-      self.compileWhile()
+    statements = "statements"
+    self.head(statements, self.depth)
+    self.depth += 1
+    self.newline()
+    # self.next()
+    while (self.token[1] != S_CCURLYBRACKETS):
+      if self.token[1] == K_LET:
+        self.compileLet()
+      elif self.token[1] == K_DO:
+        self.compileDo()
+      elif self.token[1] == K_WHILE:
+        self.compileWhile()
+      elif self.token[1] == K_RETURN:
+        self.compileReturn()
+      self.next()
+    self.depth -= 1
+    self.tail(statements, self.depth)
   
   # Compiles a let statement
   def compileLet(self):
@@ -311,9 +316,12 @@ class CompilationEngine:
     self.next()
     self.openCurlyBracket("whileStatement")
     self.next()
-    while (self.token[1] != S_CCURLYBRACKETS):
-      self.compileStatements()
-      self.next()
+    while (self.token[1] == K_VAR):
+        self.compileVarDec()
+        self.next()
+    # while (self.token[1] != S_CCURLYBRACKETS):
+    self.compileStatements()
+      # self.next()
     self.closeCurlyBracket("whileStatement")
     self.tail(whileStatement, self.depth)
     
@@ -347,8 +355,18 @@ class CompilationEngine:
     
   # Compiles a return statemetn
   def compileReturn(self):
-    pass
- 
+    returnStatement = "returnStatement"
+    self.head(returnStatement, self.depth)
+    self.depth += 1
+    self.newline()
+    self.tagAsXml(self.token)
+    self.next()
+    if self.token[1] != S_SEMICOLON:
+      raise Exception("returnStatement semicolon missing: " + self.token[1])
+    self.tagAsXml(self.token)
+    self.depth -= 1
+    self.tail(returnStatement, self.depth)
+    
  
   #.................................................
   # compilation helps

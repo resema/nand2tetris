@@ -41,7 +41,7 @@ K_DO          = "do"
 K_IF          = 18
 K_ELSE        = 19
 K_WHILE       = "while"
-K_RETURN      = 21
+K_RETURN      = "return"
 
 # Key word list
 keywordList = {

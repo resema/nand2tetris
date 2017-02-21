@@ -101,6 +101,10 @@ class JackTokenizer:
   #   only called when tokenType is SYMBOL
   def symbol(self):
     if self.type == T_SYMBOL:
+      if self.token == "<":
+        print(self.token)
+      elif self.token == ">":
+        print(self.token)
       xml = self.tagAsXML(self.type, self.token)
     else:
       raise TypeError("Error: Symbol expected: " + self.type)
