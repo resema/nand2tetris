@@ -82,7 +82,6 @@ class CompilationEngine:
     self.next()
     self.openBracket()  
     self.compileParameterList()   # parameter list
-    self.next()
     self.closeBracket()
     self.compileSubroutineBody()  # subroutine body
     self.depth -= 1
@@ -164,6 +163,7 @@ class CompilationEngine:
     if self.token[0] == T_IDENTIFIER or self.token[0] == T_STRING_CONST or self.token[0] == T_INT_CONST:
       self.tagAsXml(self.token)
       self.next()
+      # while
     self.depth -= 1
     self.tail(expressionList, self.depth)
    
@@ -174,7 +174,20 @@ class CompilationEngine:
     self.head(parameterList, self.depth)
     self.depth += 1
     self.newline()
-    # TODO missing list
+    self.next()
+    while (self.token[1] != S_CBRACKETS):
+      self.tagAsXml(self.token)
+      self.next()
+      if self.token[1] == S_KOMMA:
+        self.tagAsXml(self.token)
+        self.next()
+        if self.token[0] != T_KEYWORD:
+          raise Exception("parameterList type missing: " + self.token[1])
+        self.tagAsXml(self.token)
+        self.next()
+        self.checkIdentifier("parameterList identifier missing")
+        self.tagAsXml(self.token)
+        self.next()
     self.depth -= 1
     self.tail(parameterList, self.depth)
     
@@ -185,15 +198,13 @@ class CompilationEngine:
     self.depth += 1
     self.newline()
     self.next()
-    self.openCurlyBracket()
-    
+    self.openCurlyBracket()   
     while (self.token[1] != S_CCURLYBRACKETS):
       self.next()
       if self.token[1] == K_LET:
         self.compileLet()
       elif self.token[1] == K_VAR:
         self.compileVarDec()
-
     self.closeCurlyBracket()
     self.tail(subroutineBody, self.depth)
     
