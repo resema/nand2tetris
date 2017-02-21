@@ -143,7 +143,7 @@ class CompilationEngine:
         self.next()
         self.CompileExpressionList()
         self.closeBracket()
-    elif self.token[0] == T_SYMBOL:
+    elif self.token[0] == T_SYMBOL:     # unary op
       if self.token[1] == S_MINUS or self.token[1] == S_TILDE:
         self.tagAsXml(self.token)
         self.next()
@@ -285,7 +285,12 @@ class CompilationEngine:
     self.newline()
     self.tagAsXml(self.token)
     self.next()
-    self.checkIdentifier("doStatement identifier missing")
+    # Idenifier not must-have...
+    # self.checkIdentifier("doStatement identifier missing")
+    # self.tagAsXml(self.token)
+    # self.next()
+
+    # TODO finish doStatement
     
   # Compiles a return statemetn
   def compileReturn(self):
