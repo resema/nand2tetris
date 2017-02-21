@@ -175,19 +175,22 @@ class CompilationEngine:
     self.depth += 1
     self.newline()
     self.next()
-    while (self.token[1] != S_CBRACKETS):
+    if self.token[1] != S_CBRACKETS:
       self.tagAsXml(self.token)
       self.next()
-      if self.token[1] == S_KOMMA:
-        self.tagAsXml(self.token)
-        self.next()
-        if self.token[0] != T_KEYWORD:
-          raise Exception("parameterList type missing: " + self.token[1])
-        self.tagAsXml(self.token)
-        self.next()
-        self.checkIdentifier("parameterList identifier missing")
-        self.tagAsXml(self.token)
-        self.next()
+      self.checkIdentifier("parameterList identifier missing")
+      self.tagAsXml(self.token)
+      self.next()
+    while (self.token[1] == S_KOMMA):
+      self.tagAsXml(self.token)
+      self.next()
+      if self.token[0] != T_KEYWORD:
+        raise Exception("parameterList type missing: " + self.token[1])
+      self.tagAsXml(self.token)
+      self.next()
+      self.checkIdentifier("parameterList identifier missing")
+      self.tagAsXml(self.token)
+      self.next()
     self.depth -= 1
     self.tail(parameterList, self.depth)
     
