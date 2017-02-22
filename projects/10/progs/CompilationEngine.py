@@ -94,8 +94,8 @@ class CompilationEngine:
     self.newline()
     self.tagAsXml(self.token)
     self.next()
-    if self.token[0] != T_KEYWORD:
-      raise Exception("subroutine keyword missing: " + self.token[1])
+    if not (self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER):
+      raise Exception("subroutine keyword missing: " + self.token[0] + ", " + self.token[1])
     self.tagAsXml(self.token)
     self.next()
     self.checkIdentifier("subroutine identifier missing")
@@ -415,6 +415,8 @@ class CompilationEngine:
     self.newline()
     self.tagAsXml(self.token)
     self.next()
+    if self.token[1] != S_SEMICOLON: 
+      self.CompileExpression()
     if self.token[1] != S_SEMICOLON:
       raise Exception("returnStatement semicolon missing: " + self.token[1])
     self.tagAsXml(self.token)
