@@ -38,8 +38,8 @@ K_NULL        = 14
 K_THIS        = 15
 K_LET         = "let"
 K_DO          = "do"
-K_IF          = 18
-K_ELSE        = 19
+K_IF          = "if"
+K_ELSE        = "else"
 K_WHILE       = "while"
 K_RETURN      = "return"
 

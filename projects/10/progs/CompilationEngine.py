@@ -292,6 +292,8 @@ class CompilationEngine:
         self.compileWhile()
       elif self.token[1] == K_RETURN:
         self.compileReturn()
+      elif self.token[1] == K_IF:
+        self.compileIf()
       self.next()
     self.depth -= 1
     self.tail(statements, self.depth)
@@ -330,7 +332,30 @@ class CompilationEngine:
   # Compiles an if statement
   #   possibly with a trailing else statement
   def compileIf(self):
-    pass
+    ifStatement = "ifStatement"
+    self.head(ifStatement, self.depth)
+    self.depth += 1
+    self.newline()
+    self.tagAsXml(self.token)
+    self.next()
+    self.openBracket("ifStatement")
+    self.next()
+    self.CompileExpression()
+    self.closeBracket("ifStatement")
+    self.next()
+    self.openCurlyBracket("ifStatement")
+    self.next()
+    self.compileStatements()
+    self.closeCurlyBracket("ifStatement")
+    self.next() # ???
+    if self.token[1] == K_ELSE:
+      self.tagAsXml(self.token)
+      self.next()
+      self.openCurlyBracket("elseStatement")
+      self.next()
+      self.compileStatements()
+      self.closeCurlyBracket("elseStatement")
+    self.tail(ifStatement, self.depth)
     
   # Compiles a while statement
   def compileWhile(self):
@@ -347,12 +372,10 @@ class CompilationEngine:
     self.next()
     self.openCurlyBracket("whileStatement")
     self.next()
-    while (self.token[1] == K_VAR):
-        self.compileVarDec()
-        self.next()
-    # while (self.token[1] != S_CCURLYBRACKETS):
+    # while (self.token[1] == K_VAR):
+        # self.compileVarDec()
+        # self.next()
     self.compileStatements()
-      # self.next()
     self.closeCurlyBracket("whileStatement")
     self.tail(whileStatement, self.depth)
     
