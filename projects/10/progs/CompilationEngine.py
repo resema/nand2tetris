@@ -47,13 +47,44 @@ class CompilationEngine:
       if self.token[0] == T_KEYWORD:
         if self.token[1] == K_CONSTRUCTOR or self.token[1] == K_FUNCTION or self.token[1] == K_METHOD:
           self.CompileSubroutineDec()     # subroutine declaration
+        elif self.token[1] == K_FIELD or self.token[1] == K_STATIC:
+          self.CompileClassVarDec()
     self.closeCurlyBracket("class")
     self.tail(classHead[1])
     self.fobj_out.write(self.tree)
     
   # Compiles a static variable declaration of a field declaration
   def CompileClassVarDec(self):
-    pass
+    classVarDec = "classVarDec"
+    self.head(classVarDec, self.depth)
+    self.depth += 1
+    self.newline()
+    self.tagAsXml(self.token)
+    self.next()
+    if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
+      self.tagAsXml(self.token)
+      self.next()
+    else:
+      raise Exception("classVarDec type missing: " + self.token[1])
+    if self.token[0] == T_IDENTIFIER:
+      self.tagAsXml(self.token)
+      self.next()
+    else:
+      raise Exception("classVarDec identifier missing: " + self.token[1])
+    while (self.token[1] != S_SEMICOLON):
+      if self.token[1] != S_KOMMA:
+        raise Exception("classVarDec initializer list komma missing: " + self.token[1])
+      self.tagAsXml(self.token)
+      self.next()
+      if self.token[0] != T_IDENTIFIER:
+        raise Exception("classVarDec identifier missing: " + self.token[1])
+      self.tagAsXml(self.token)
+      self.next()
+    if self.token[1] != S_SEMICOLON:
+      raise Exception("classVarDec semicolon missing: " + self.token[1])
+    self.tagAsXml(self.token)
+    self.depth -= 1
+    self.tail(classVarDec, self.depth)
     
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
@@ -239,7 +270,7 @@ class CompilationEngine:
       self.tagAsXml(self.token)
       self.next()
     if self.token[1] != S_SEMICOLON:
-      raise Exception("letStatement semicolon missing: " + self.token[1])
+      raise Exception("varDec semicolon missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.depth -= 1
     self.tail(varDec, self.depth)
