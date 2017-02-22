@@ -142,6 +142,8 @@ class CompilationEngine:
     self.newline()
     if self.token[0] == T_INT_CONST or self.token[0] == T_STRING_CONST:
       self.tagAsXml(self.token)
+    elif self.token[1] == K_THIS or self.token[1] == K_NULL or self.token[1] == K_TRUE or self.token[1] == K_FALSE:
+      self.tagAsXml(self.token)
     elif self.token[0] == T_IDENTIFIER:
       self.tagAsXml(self.token)
       if next[1] == S_OANGLEBRACKETS:   # array
@@ -290,10 +292,10 @@ class CompilationEngine:
         self.compileDo()
       elif self.token[1] == K_WHILE:
         self.compileWhile()
-      elif self.token[1] == K_RETURN:
-        self.compileReturn()
       elif self.token[1] == K_IF:
         self.compileIf()
+      elif self.token[1] == K_RETURN:
+        self.compileReturn()
       self.next()
     self.depth -= 1
     self.tail(statements, self.depth)
@@ -347,7 +349,6 @@ class CompilationEngine:
     self.next()
     self.compileStatements()
     self.closeCurlyBracket("ifStatement")
-    self.next() # ???
     if self.token[1] == K_ELSE:
       self.tagAsXml(self.token)
       self.next()
