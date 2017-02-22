@@ -58,12 +58,18 @@ class JackTokenizer:
     self.token = self.tokens.pop(0)
     if (len(self.tokens)):
       self.next = self.tokens[0]
-    if (self.token == ('\"')):  # combine the splitted string parts
-      tmp = self.token
-      while(self.next != ('\"')):
-        self.token = self.next = self.tokens.pop(0)
-        tmp += self.next
-      self.token = tmp
+    self.recreateString()         # combine the splitted string parts
+    # if (self.token == ('\"')):  # combine the splitted string parts
+      # tmp = self.token
+      # while(self.next != ('\"')):
+        # self.token = self.next = self.tokens.pop(0)
+        # tmp += self.next
+      # self.token = tmp
+    self.replaceGthanLthan()      # replace < and >
+    # elif self.token == "<":     # replace < with &lt;
+      # self.token = "&lt;"
+    # elif self.token == ">":     # replace > with &gt;
+      # self.token = "&gt;"
     if self.token == " ":       # remove recursely the empty lines
       self.advance()
     
@@ -88,6 +94,22 @@ class JackTokenizer:
       self.type = T_IDENTIFIER
     return self.type
     
+  # recreate string
+  def recreateString(self):
+    if (self.token == ('\"')):  # combine the splitted string parts
+      tmp = self.token
+      while(self.next != ('\"')):
+        self.token = self.next = self.tokens.pop(0)
+        tmp += self.next
+      self.token = tmp
+      
+  # replace symbols
+  def replaceGthanLthan(self):
+    if self.token == "<":     # replace < with &lt;
+      self.token = "&lt;"
+    elif self.token == ">":     # replace > with &gt;
+      self.token = "&gt;"
+    
   # returns the keyword which is the current token
   #   only called when tokenType is KEYWORD
   def keyWord(self):
@@ -101,10 +123,6 @@ class JackTokenizer:
   #   only called when tokenType is SYMBOL
   def symbol(self):
     if self.type == T_SYMBOL:
-      if self.token == "<":
-        print(self.token)
-      elif self.token == ">":
-        print(self.token)
       xml = self.tagAsXML(self.type, self.token)
     else:
       raise TypeError("Error: Symbol expected: " + self.type)

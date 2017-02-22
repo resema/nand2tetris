@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # create filename for in and output file
     path = file.split(".")
     noExt = path[-2]
-    filename = noExt + ".xml"
+    filename = noExt + "S.xml"
     print(filename)
     fobj_in = open(file)
     fobj_out = open(filename, 'w')
@@ -78,7 +78,8 @@ if __name__ == "__main__":
       except TypeError as err:
         print("Handling TypeError:", err)
     
-    # print(listOfTokens)
+    # for l in listOfTokens:
+      # print(l)
     
     engine = CompilationEngine.CompilationEngine(listOfTokens, fobj_out)
     engine.run()

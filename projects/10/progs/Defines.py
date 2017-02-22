@@ -86,8 +86,8 @@ S_STAR            = "*"
 S_SLASH           = "/"
 S_AMPERSAND       = "&"
 S_PIPE            = "|"
-S_LESSTHAN        = "<"
-S_GREATERTHAN     = ">"
+S_LESSTHAN        = "&lt;"
+S_GREATERTHAN     = "&gt;"
 S_EQUALS          = "="
 S_TILDE           = "~"
 
@@ -108,8 +108,8 @@ symbolList = {
             "/"   :   S_SLASH,
             "&"   :   S_AMPERSAND,
             "|"   :   S_PIPE,
-            "<"   :   S_LESSTHAN,
-            ">"   :   S_GREATERTHAN,
+            "&lt;":   S_LESSTHAN,
+            "&gt;"   :   S_GREATERTHAN,
             "="   :   S_EQUALS,
             "~"   :   S_TILDE
           }
