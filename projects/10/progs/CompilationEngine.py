@@ -349,7 +349,8 @@ class CompilationEngine:
     self.next()
     self.compileStatements()
     self.closeCurlyBracket("ifStatement")
-    if self.token[1] == K_ELSE:
+    if self.peek()[1] == K_ELSE:
+      self.next()
       self.tagAsXml(self.token)
       self.next()
       self.openCurlyBracket("elseStatement")
