@@ -165,13 +165,17 @@ class CompilationEngine:
         self.next()
         self.CompileExpressionList()
         self.closeBracket("term")
-    elif self.token[0] == T_SYMBOL:     # unary op
+    elif self.token[0] == T_SYMBOL:
       if self.token[1] == S_MINUS or self.token[1] == S_TILDE:
         self.tagAsXml(self.token)
         self.next()
-        self.tagAsXml(self.token)
-      else:
-        raise Exception("unary op missing" + self.token[1])
+        self.CompileTerm()
+      elif self.token[1] == S_OBRACKETS:
+        self.openBracket("unary op")
+        self.next()
+        self.CompileExpression()
+      if self.token[1] == S_CBRACKETS:
+        self.closeBracket("unary op")
     else:
       raise Exception("term not compilable: " + self.token[1])
     self.depth -= 1
