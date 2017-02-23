@@ -40,8 +40,7 @@ class CompilationEngine:
     self.checkIdentifier("class name missing")
     self.tagAsXml(self.token)
     self.next()
-    self.openCurlyBracket("class")
-    
+    self.openCurlyBracket("class")   
     while (len(self.listOfTokens) > 1):    # leave closing bracket to the class implementation
       self.next()
       if self.token[0] == T_KEYWORD:
@@ -232,15 +231,7 @@ class CompilationEngine:
     while (self.token[1] == K_VAR):
         self.compileVarDec()
         self.next()
-    # while (self.token[1] != S_CCURLYBRACKETS):
     self.compileStatements()
-      # self.next()
-      # if self.token[1] == K_LET:
-        # self.compileLet()
-      # elif self.token[1] == K_VAR:
-        # self.compileVarDec()
-      # elif self.token[1] == K_DO:
-        # self.compileDo()
     self.closeCurlyBracket("subroutine body")
     self.tail(subroutineBody, self.depth)
     
@@ -332,7 +323,6 @@ class CompilationEngine:
     self.tail(letStatement, self.depth)
     
   # Compiles an if statement
-  #   possibly with a trailing else statement
   def compileIf(self):
     ifStatement = "ifStatement"
     self.head(ifStatement, self.depth)
@@ -374,9 +364,6 @@ class CompilationEngine:
     self.next()
     self.openCurlyBracket("whileStatement")
     self.next()
-    # while (self.token[1] == K_VAR):
-        # self.compileVarDec()
-        # self.next()
     self.compileStatements()
     self.closeCurlyBracket("whileStatement")
     self.tail(whileStatement, self.depth)

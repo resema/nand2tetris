@@ -59,17 +59,7 @@ class JackTokenizer:
     if (len(self.tokens)):
       self.next = self.tokens[0]
     self.recreateString()         # combine the splitted string parts
-    # if (self.token == ('\"')):  # combine the splitted string parts
-      # tmp = self.token
-      # while(self.next != ('\"')):
-        # self.token = self.next = self.tokens.pop(0)
-        # tmp += self.next
-      # self.token = tmp
     self.replaceGthanLthan()      # replace < and >
-    # elif self.token == "<":     # replace < with &lt;
-      # self.token = "&lt;"
-    # elif self.token == ">":     # replace > with &gt;
-      # self.token = "&gt;"
     if self.token == " ":       # remove recursely the empty lines
       self.advance()
     
