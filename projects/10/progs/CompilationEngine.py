@@ -174,8 +174,8 @@ class CompilationEngine:
         self.openBracket("unary op")
         self.next()
         self.CompileExpression()
-      if self.token[1] == S_CBRACKETS:
-        self.closeBracket("unary op")
+        if self.token[1] == S_CBRACKETS:
+          self.closeBracket("unary op")
     else:
       raise Exception("term not compilable: " + self.token[1])
     self.depth -= 1

@@ -84,7 +84,7 @@ S_PLUS            = "+"
 S_MINUS           = "-"
 S_STAR            = "*"
 S_SLASH           = "/"
-S_AMPERSAND       = "&"
+S_AMPERSAND       = "&amp;"
 S_PIPE            = "|"
 S_LESSTHAN        = "&lt;"
 S_GREATERTHAN     = "&gt;"
@@ -93,25 +93,25 @@ S_TILDE           = "~"
 
 # symbol list
 symbolList = { 
-            "{"   :   S_OCURLYBRACKETS, 
-            "}"   :   S_CCURLYBRACKETS,
-            "["   :   S_OANGLEBRACKETS,
-            "]"   :   S_CANGLEBRACKETS,
-            "("   :   S_OBRACKETS,
-            ")"   :   S_CBRACKETS,
-            "."   :   S_POINT,
-            ","   :   S_KOMMA,
-            ";"   :   S_SEMICOLON,
-            "+"   :   S_PLUS,
-            "-"   :   S_MINUS,
-            "*"   :   S_STAR,
-            "/"   :   S_SLASH,
-            "&"   :   S_AMPERSAND,
-            "|"   :   S_PIPE,
-            "&lt;":   S_LESSTHAN,
-            "&gt;"   :   S_GREATERTHAN,
-            "="   :   S_EQUALS,
-            "~"   :   S_TILDE
+            "{"     :   S_OCURLYBRACKETS, 
+            "}"     :   S_CCURLYBRACKETS,
+            "["     :   S_OANGLEBRACKETS,
+            "]"     :   S_CANGLEBRACKETS,
+            "("     :   S_OBRACKETS,
+            ")"     :   S_CBRACKETS,
+            "."     :   S_POINT,
+            ","     :   S_KOMMA,
+            ";"     :   S_SEMICOLON,
+            "+"     :   S_PLUS,
+            "-"     :   S_MINUS,
+            "*"     :   S_STAR,
+            "/"     :   S_SLASH,
+            "&amp;" :   S_AMPERSAND,
+            "|"     :   S_PIPE,
+            "&lt;"  :   S_LESSTHAN,
+            "&gt;"  :   S_GREATERTHAN,
+            "="     :   S_EQUALS,
+            "~"     :   S_TILDE
           }
 
 

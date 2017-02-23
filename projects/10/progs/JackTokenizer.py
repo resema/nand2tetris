@@ -59,6 +59,7 @@ class JackTokenizer:
     if (len(self.tokens)):
       self.next = self.tokens[0]
     self.recreateString()         # combine the splitted string parts
+    self.replaceAmpersand()
     self.replaceGthanLthan()      # replace < and >
     if self.token == " ":       # remove recursely the empty lines
       self.advance()
@@ -99,6 +100,10 @@ class JackTokenizer:
       self.token = "&lt;"
     elif self.token == ">":     # replace > with &gt;
       self.token = "&gt;"
+   
+  def replaceAmpersand(self):
+    if self.token == "&":     # replace < with &lt;
+      self.token = "&amp;"
     
   # returns the keyword which is the current token
   #   only called when tokenType is KEYWORD
