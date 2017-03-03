@@ -10,6 +10,8 @@
 #
 #***********************************************************
 
+import SymbolTable
+
 from Defines import *
 
 class CompilationEngine:
@@ -21,6 +23,8 @@ class CompilationEngine:
     self.token = ""
     self.depth = 0
     self.tree = ""
+    self.classTable = SymbolTable.SymbolTable()
+    self.subroutineTable = SymbolTable.SymbolTable()
     
   def run(self):
     while (len(self.listOfTokens) > 0):
@@ -58,8 +62,11 @@ class CompilationEngine:
     self.head(classVarDec, self.depth)
     self.depth += 1
     self.newline()
+    # type of locals
     self.tagAsXml(self.token)
+    
     self.next()
+    # locals of type variable or class
     if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
       self.tagAsXml(self.token)
       self.next()
@@ -79,8 +86,8 @@ class CompilationEngine:
         raise Exception("classVarDec identifier missing: " + self.token[1])
       self.tagAsXml(self.token)
       self.next()
-    if self.token[1] != S_SEMICOLON:
-      raise Exception("classVarDec semicolon missing: " + self.token[1])
+    # if self.token[1] != S_SEMICOLON:
+      # raise Exception("classVarDec semicolon missing: " + self.token[1])
     self.tagAsXml(self.token)
     self.depth -= 1
     self.tail(classVarDec, self.depth)

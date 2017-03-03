@@ -115,10 +115,10 @@ symbolList = {
           }
 
 # virtual memory type
-STATIC  = 0
-FIELD   = 1
-LOCAL   = 2
-ARG     = 3 
+STATIC  = "static"
+FIELD   = "field"
+LOCAL   = "local"
+ARG     = "argument" 
 
 
 

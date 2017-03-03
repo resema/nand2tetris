@@ -27,62 +27,45 @@ class SymbolTable:
     
   # Adds a new identifier and assigns a running index
   def define(self, name, type, kind):
-    self.symbolTable[name] = [type, kind, self.increaseCounter(kind)]
+    if name not in self.symbolTable:
+      self.symbolTable[name] = [type, kind, self.increaseCounter(kind)]
     
   # Returns the number of variables of the given kind
   def VarCount(self, kind):
     varCount = -1
-    if type == STATIC:
+    if kind == STATIC:
       varCount = self.staticCnt
-    elif type == FIELD:
+    elif kind == FIELD:
       varCount = self.fieldCnt
-    elif type == LOCAL:
+    elif kind == LOCAL:
       varCount = self.localCnt
-    elif type == ARG:
+    elif kind == ARG:
       varCount = self.argCnt
     return varCount
     
   # Returns the kind of the named identifier
-  def KindOf(self. name):
+  def KindOf(self, name):
     kind = -1
     entry = findEntry(name)
-    #TODO: insert defensive programming
-    
-    if entry[1] == STATIC:
-      kind = STATIC
-    elif entry[1] == FIELD:
-      kind = FIELD
-    elif entry[1] == LOCAL:
-      kind = LOCAL
-    elif entry[1] == ARG:
-      kind = ARG
+    if entry != []:
+      kind =  entry[2]
     return kind
     
   # Returns the type of the named identifier
   def TypeOf(self, name):
-    varCount = -1
-    if type == STATIC:
-      varCount = self.staticIdx
-    elif type == FIELD:
-      varCount = self.fieldIdx
-    elif type == LOCAL:
-      varCount = self.localIdx
-    elif type == ARG:
-      varCount = self.argIdx
-    return varCount
+    type = ""
+    entry = findEntry(name)
+    if entry != []:
+      type = entry[2]
+    return type
     
   # Returns the index assigned to the named identifier
   def IndexOf(self, name):
-    varCount = -1
-    if type == STATIC:
-      varCount = self.staticIdx
-    elif type == FIELD:
-      varCount = self.fieldIdx
-    elif type == LOCAL:
-      varCount = self.localIdx
-    elif type == ARG:
-      varCount = self.argIdx
-    return varCount
+    idx = -1
+    entry = findEntry(name)
+    if entry != []:
+      idx = entry[3]
+    return idx
     
   #......................................................
   # Helper functions
@@ -103,7 +86,7 @@ class SymbolTable:
     return counter
       
   # Finds the entry in the hash table / dictionary
-  def findEntry(self. name):
+  def findEntry(self, name):
     retVal = []
     if name in self.symbolTable:
       retVal = self.symbolTable[name]
