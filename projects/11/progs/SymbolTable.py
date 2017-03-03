@@ -13,6 +13,7 @@
 #
 #***********************************************************
 
+from Defines import *
 
 class SymbolTable:
   
@@ -72,17 +73,17 @@ class SymbolTable:
   def increaseCounter(self, type):
     counter = 0;
     if type == STATIC:
-      counter = self.staticIdx
-      self.staticIdx += 1
+      counter = self.staticCnt
+      self.staticCnt += 1
     elif type == FIELD:
-      counter = self.fieldIdx
-      self.fieldIdx += 1
+      counter = self.fieldCnt
+      self.fieldCnt += 1
     elif type == LOCAL:
-      coutner = self.localIdx
-      self.localIdx += 1
+      coutner = self.localCnt
+      self.localCnt += 1
     elif type == ARG:
-      coutner = self.argIdx
-      self.argIdx += 1
+      coutner = self.argCnt
+      self.argCnt += 1
     return counter
       
   # Finds the entry in the hash table / dictionary
@@ -91,6 +92,11 @@ class SymbolTable:
     if name in self.symbolTable:
       retVal = self.symbolTable[name]
     return retVal
+      
+  # print the symbol table
+  def printTable(self):
+    for e in self.symbolTable:
+      print(e + ' ' + str(self.symbolTable[e]))
       
       
       

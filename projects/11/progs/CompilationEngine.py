@@ -56,41 +56,36 @@ class CompilationEngine:
     self.tail(classHead[1])
     self.fobj_out.write(self.tree)
     
+    self.classTable.printTable()
+    
   # Compiles a static variable declaration of a field declaration
   def CompileClassVarDec(self):
-    classVarDec = "classVarDec"
-    self.head(classVarDec, self.depth)
-    self.depth += 1
-    self.newline()
-    # type of locals
-    self.tagAsXml(self.token)
-    
+    kind = self.token[1]    
     self.next()
+    
     # locals of type variable or class
     if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
-      self.tagAsXml(self.token)
+      type = self.token[1]
       self.next()
     else:
       raise Exception("classVarDec type missing: " + self.token[1])
     if self.token[0] == T_IDENTIFIER:
-      self.tagAsXml(self.token)
+      name = self.token[1]
       self.next()
     else:
       raise Exception("classVarDec identifier missing: " + self.token[1])
+    
+    self.classTable.define(name, type, kind)
     while (self.token[1] != S_SEMICOLON):
       if self.token[1] != S_KOMMA:
         raise Exception("classVarDec initializer list komma missing: " + self.token[1])
-      self.tagAsXml(self.token)
       self.next()
       if self.token[0] != T_IDENTIFIER:
         raise Exception("classVarDec identifier missing: " + self.token[1])
-      self.tagAsXml(self.token)
+      name = self.token[1]
       self.next()
-    # if self.token[1] != S_SEMICOLON:
-      # raise Exception("classVarDec semicolon missing: " + self.token[1])
-    self.tagAsXml(self.token)
+      self.classTable.define(name, type, kind)
     self.depth -= 1
-    self.tail(classVarDec, self.depth)
     
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
