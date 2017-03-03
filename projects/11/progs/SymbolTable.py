@@ -82,7 +82,7 @@ class SymbolTable:
       coutner = self.localCnt
       self.localCnt += 1
     elif type == ARG:
-      coutner = self.argCnt
+      counter = self.argCnt
       self.argCnt += 1
     return counter
       
@@ -94,10 +94,12 @@ class SymbolTable:
     return retVal
       
   # print the symbol table
-  def printTable(self):
+  def printTable(self, iden):
+    print()
+    print(iden)
     for e in self.symbolTable:
-      print(e + ' ' + str(self.symbolTable[e]))
-      
+      print('\t' + e + ' ' + str(self.symbolTable[e]))
+    print()
       
       
       

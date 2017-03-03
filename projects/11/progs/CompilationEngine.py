@@ -25,6 +25,7 @@ class CompilationEngine:
     self.tree = ""
     self.classTable = SymbolTable.SymbolTable()
     self.subroutineTable = SymbolTable.SymbolTable()
+    self.className = ""
     
   def run(self):
     while (len(self.listOfTokens) > 0):
@@ -35,14 +36,15 @@ class CompilationEngine:
     
   # Compiles a complete class
   def CompileClass(self):
-    classHead = self.token
-    self.head(classHead[1])
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
+    # classHead = self.token
+    # self.head(classHead[1])
+    # self.depth += 1
+    # self.newline()
+    # self.tagAsXml(self.token)
     self.next()
     self.checkIdentifier("class name missing")
-    self.tagAsXml(self.token)
+    self.className = self.token[1]
+    # self.tagAsXml(self.token)
     self.next()
     self.openCurlyBracket("class")   
     while (len(self.listOfTokens) > 1):    # leave closing bracket to the class implementation
@@ -50,13 +52,17 @@ class CompilationEngine:
       if self.token[0] == T_KEYWORD:
         if self.token[1] == K_CONSTRUCTOR or self.token[1] == K_FUNCTION or self.token[1] == K_METHOD:
           self.CompileSubroutineDec()     # subroutine declaration
+          
+          #TODO Testing
+          self.subroutineTable.printTable("Subroutine Symbol Table")
         elif self.token[1] == K_FIELD or self.token[1] == K_STATIC:
           self.CompileClassVarDec()
     self.closeCurlyBracket("class")
-    self.tail(classHead[1])
-    self.fobj_out.write(self.tree)
+    # self.tail(classHead[1])
+    # self.fobj_out.write(self.tree)
     
-    self.classTable.printTable()
+    #TODO Testing
+    self.classTable.printTable("Class Symbol Table")
     
   # Compiles a static variable declaration of a field declaration
   def CompileClassVarDec(self):
@@ -89,25 +95,29 @@ class CompilationEngine:
     
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
-    subroutineDec = "subroutineDec"
-    self.head(subroutineDec, self.depth)
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
+    # subroutineDec = "subroutineDec"
+    # self.head(subroutineDec, self.depth)
+    # self.depth += 1
+    # self.newline()
+    # self.tagAsXml(self.token)  
+    
+    # new subroutine symbol table with this
+    self.subroutineTable = SymbolTable.SymbolTable()
+    self.subroutineTable.define(K_THIS, self.className, ARG)
     self.next()
     if not (self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER):
       raise Exception("subroutine keyword missing: " + self.token[0] + ", " + self.token[1])
-    self.tagAsXml(self.token)
+    # self.tagAsXml(self.token)
     self.next()
     self.checkIdentifier("subroutine identifier missing")
-    self.tagAsXml(self.token)
+    # self.tagAsXml(self.token)
     self.next()
     self.openBracket("subroutine decl")  
     self.compileParameterList()   # parameter list
     self.closeBracket("subroutine decl")
     self.compileSubroutineBody()  # subroutine body
-    self.depth -= 1
-    self.tail(subroutineDec, self.depth)
+    # self.depth -= 1
+    # self.tai  l(subroutineDec, self.depth)
     
   # Compiles an expression and returns a semicolon as token
   #  TODO returns already the next token
@@ -201,29 +211,35 @@ class CompilationEngine:
   # Compiles a possible emtpy parameter list
   #   Does not handle the enclosing "()"
   def compileParameterList(self):
-    parameterList = "parameterList"
-    self.head(parameterList, self.depth)
-    self.depth += 1
-    self.newline()
+    # parameterList = "parameterList"
+    # self.head(parameterList, self.depth)
+    # self.depth += 1
+    # self.newline()
     self.next()
     if self.token[1] != S_CBRACKETS:
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
+      type = self.token[1]
       self.next()
       self.checkIdentifier("parameterList first identifier missing")
-      self.tagAsXml(self.token)
+      name = self.token[1]
+      self.subroutineTable.define(name, type, ARG)
+      # self.tagAsXml(self.token)
       self.next()
     while (self.token[1] == S_KOMMA):
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
       self.next()
       if self.token[0] != T_KEYWORD:
         raise Exception("parameterList type missing: " + self.token[1])
-      self.tagAsXml(self.token)
+      type = self.token[1]
+      # self.tagAsXml(self.token)
       self.next()
       self.checkIdentifier("parameterList identifier missing")
-      self.tagAsXml(self.token)
+      name = self.token[1]
+      self.subroutineTable.define(name, type, ARG)
+      # self.tagAsXml(self.token)
       self.next()
-    self.depth -= 1
-    self.tail(parameterList, self.depth)
+    # self.depth -= 1
+    # self.tail(parameterList, self.depth)
     
   # Compiles a subroutine's body
   def compileSubroutineBody(self):
@@ -431,26 +447,26 @@ class CompilationEngine:
   def openBracket(self, exception):
     if self.token[1] != S_OBRACKETS:
       raise Exception(exception + " opening bracket is missing: " + self.token[1])
-    self.tagAsXml(self.token)
+    # self.tagAsXml(self.token)
    
   # Compile clsing bracket
   def closeBracket(self, exception):
     if self.token[1] != S_CBRACKETS:
       raise Exception(exception + " closing bracket is missing: " + self.token[1])
-    self.tagAsXml(self.token)
+    # self.tagAsXml(self.token)
     
   # Compile open curly brackets
   def openCurlyBracket(self, exception):
     if self.token[0] != T_SYMBOL and self.token[1] != S_OCURLYBRACKETS:
       raise Exception(exception + " opening curly bracket missing: " + self.token[1])
-    self.tagAsXml(self.token)
+    # self.tagAsXml(self.token)
 
   # Compile close curly brackets
   def closeCurlyBracket(self, exception):
     if self.token[1] != S_CCURLYBRACKETS:
       raise Exception(exception + " closing curly bracket missing: " + self.token[1])
-    self.tagAsXml(self.token)
-    self.depth -= 1
+    # self.tagAsXml(self.token)
+    # self.depth -= 1
    
    
   #.................................................
