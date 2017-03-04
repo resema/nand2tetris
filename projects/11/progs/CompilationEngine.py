@@ -44,6 +44,7 @@ class CompilationEngine:
     self.next()
     self.checkIdentifier("class name missing")
     self.className = self.token[1]
+    self.classTable.setName(self.token[1])
     # self.tagAsXml(self.token)
     self.next()
     self.openCurlyBracket("class")   
@@ -100,10 +101,6 @@ class CompilationEngine:
     # self.depth += 1
     # self.newline()
     # self.tagAsXml(self.token)  
-    
-    # new subroutine symbol table with this
-    self.subroutineTable = SymbolTable.SymbolTable()
-    self.subroutineTable.define(K_THIS, self.className, ARG)
     self.next()
     if not (self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER):
       raise Exception("subroutine keyword missing: " + self.token[0] + ", " + self.token[1])
@@ -111,6 +108,12 @@ class CompilationEngine:
     self.next()
     self.checkIdentifier("subroutine identifier missing")
     # self.tagAsXml(self.token)
+
+    # new subroutine symbol table with this
+    self.subroutineTable = SymbolTable.SymbolTable()
+    self.subroutineTable.setName(self.token[1])
+    self.subroutineTable.define(K_THIS, self.className, ARG)
+
     self.next()
     self.openBracket("subroutine decl")  
     self.compileParameterList()   # parameter list
@@ -243,10 +246,10 @@ class CompilationEngine:
     
   # Compiles a subroutine's body
   def compileSubroutineBody(self):
-    subroutineBody = "subroutineBody"
-    self.head(subroutineBody, self.depth)
-    self.depth += 1
-    self.newline()
+    # subroutineBody = "subroutineBody"
+    # self.head(subroutineBody, self.depth)
+    # self.depth += 1
+    # self.newline()
     self.next()
     self.openCurlyBracket("subroutine body")   
     self.next()
@@ -255,40 +258,45 @@ class CompilationEngine:
         self.next()
     self.compileStatements()
     self.closeCurlyBracket("subroutine body")
-    self.tail(subroutineBody, self.depth)
+    # self.tail(subroutineBody, self.depth)
     
   # Compiles a var declaration
   def compileVarDec(self):
-    varDec = "varDec"
-    self.head(varDec, self.depth)
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
+    # varDec = "varDec"
+    # self.head(varDec, self.depth)
+    # self.depth += 1
+    # self.newline()
+    # self.tagAsXml(self.token)
     self.next()
     if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
+      type = self.token[1]
       self.next()
     else:
       raise Exception("varDec type missing: " + self.token[1])
     if self.token[0] == T_IDENTIFIER:
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
+      name = self.token[1]
       self.next()
     else:
       raise Exception("varDec identifier missing: " + self.token[1])
+    self.subroutineTable.define(name, type, LOCAL)
     while (self.token[1] != S_SEMICOLON):
       if self.token[1] != S_KOMMA:
         raise Exception("varDec initializer list komma missing: " + self.token[1])
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
       self.next()
       if self.token[0] != T_IDENTIFIER:
         raise Exception("varDec identifier missing: " + self.token[1])
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
+      name = self.token[1]
       self.next()
+      self.subroutineTable.define(name, type, LOCAL)
     if self.token[1] != S_SEMICOLON:
       raise Exception("varDec semicolon missing: " + self.token[1])
-    self.tagAsXml(self.token)
-    self.depth -= 1
-    self.tail(varDec, self.depth)
+    # self.tagAsXml(self.token)
+    # self.depth -= 1
+    # self.tail(varDec, self.depth)
     
   # Compiles a sequence of statements
   #    Does not handle the enclosing "{}"

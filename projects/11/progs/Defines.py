@@ -117,7 +117,7 @@ symbolList = {
 # virtual memory type
 STATIC  = "static"
 FIELD   = "field"
-LOCAL   = "local"
+LOCAL   = "var"
 ARG     = "argument" 
 
 

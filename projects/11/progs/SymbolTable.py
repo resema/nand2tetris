@@ -20,16 +20,23 @@ class SymbolTable:
   # cstor
   #   creates new symbol table
   def __init__(self):
+    self.tableName = ""
     self.symbolTable = {}
     self.staticCnt = 0
     self.fieldCnt = 0
     self.localCnt = 0
     self.argCnt = 0
     
+  # Give the table an identifier name
+  def setName(self, tableName):
+    self.tableName = tableName
+    
   # Adds a new identifier and assigns a running index
   def define(self, name, type, kind):
     if name not in self.symbolTable:
       self.symbolTable[name] = [type, kind, self.increaseCounter(kind)]
+    else:
+      raise Exception("*ERROR* \"" + kind + " " + type + " " + name + "\" redefinition")
     
   # Returns the number of variables of the given kind
   def VarCount(self, kind):
@@ -79,7 +86,7 @@ class SymbolTable:
       counter = self.fieldCnt
       self.fieldCnt += 1
     elif type == LOCAL:
-      coutner = self.localCnt
+      counter = self.localCnt
       self.localCnt += 1
     elif type == ARG:
       counter = self.argCnt
@@ -96,7 +103,7 @@ class SymbolTable:
   # print the symbol table
   def printTable(self, iden):
     print()
-    print(iden)
+    print(iden + ": " + self.tableName)
     for e in self.symbolTable:
       print('\t' + e + ' ' + str(self.symbolTable[e]))
     print()
