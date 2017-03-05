@@ -114,11 +114,27 @@ symbolList = {
             "~"     :   S_TILDE
           }
 
-# virtual memory type
+# virtual memory type and additional segments
 STATIC  = "static"
 FIELD   = "field"
 LOCAL   = "var"
 ARG     = "argument" 
+CONST   = "const"
+THIS    = "this"
+THAT    = "that"
+POINTER = "pointer"
+TEMP    = "temp"
+
+# arithmetic logical commands
+ADD     = "add"
+SUB     = "sub"
+NEG     = "neg"
+EQ      = "eq"
+GT      = "gt"
+LT      = "lt"
+AND     = "and"
+OR      = "or"
+NOT     = "not"
 
 
 

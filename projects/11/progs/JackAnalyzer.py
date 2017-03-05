@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # create filename for in and output file
     path = file.split(".")
     noExt = path[-2]
-    filename = noExt + "S.xml"
+    filename = noExt + ".vm"
     print(filename)
     fobj_in = open(file)
     fobj_out = open(filename, 'w')
