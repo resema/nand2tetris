@@ -41,8 +41,8 @@ class VMWriter:
     pass
     
   # Writes a VM call command
-  def writeCall(self, label):
-    pass
+  def writeCall(self, label, nArgs):
+    self.fobj_out.write("call" + " " + label + " " + str(nArgs) + "\n")
     
   # Writes a VM function command
   def writeFunction(self, name, nLocals):

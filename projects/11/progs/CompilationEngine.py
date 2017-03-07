@@ -116,22 +116,22 @@ class CompilationEngine:
   # Compiles an expression and returns a semicolon as token
   #  TODO returns already the next token
   def CompileExpression(self):
-    expression = "expression"
-    self.head(expression, self.depth)
-    self.depth += 1
-    self.newline()
+    # expression = "expression"
+    # self.head(expression, self.depth)
+    # self.depth += 1
+    # self.newline()
     self.CompileTerm()
     self.next()
     while (self.token[1] == S_PLUS or self.token[1] == S_MINUS or self.token[1] == S_STAR or
            self.token[1] == S_SLASH or self.token[1] == S_AMPERSAND or self.token[1] == S_PIPE or
            self.token[1] == S_LESSTHAN or self.token[1] == S_GREATERTHAN or self.token[1] == S_EQUALS):
       if self.token[0] == T_SYMBOL:
-        self.tagAsXml(self.token)               # op 
+        # self.tagAsXml(self.token)               # op 
         self.next()
       self.CompileTerm()
       self.next()
-    self.depth -= 1
-    self.tail(expression, self.depth)
+    # self.depth -= 1
+    # self.tail(expression, self.depth)
     
   # Compiles a term
   #   If the token is an identifier, the routine must distinguish beteen a variable,
@@ -140,32 +140,41 @@ class CompilationEngine:
   #   distinguish between the possibilities.
   #   Any other token is not part of this term
   def CompileTerm(self):
-    term = "term"
-    next = self.peek()
-    self.head(term, self.depth)
-    self.depth += 1
-    self.newline()
+    # term = "term"
+    # next = self.peek()
+    # self.head(term, self.depth)
+    # self.depth += 1
+    # self.newline()
     if self.token[0] == T_INT_CONST or self.token[0] == T_STRING_CONST:
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
+      kind = "constant"
+      idx = self.token[1]
+      self.vmWriter.writePush(kind, idx)
     elif self.token[1] == K_THIS or self.token[1] == K_NULL or self.token[1] == K_TRUE or self.token[1] == K_FALSE:
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
+      kind = self.subroutineTable.KindOf(self.token[1])
+      idx = self.subroutineTable.IndexOf(self.token[1])
+      if kind == -1:
+        kind = self.classTable.KindOf(self.token[1])
+        idx = self.classTable.IndexOf(self.token[1])
+      self.vmWriter.writePush(kind, idx)
     elif self.token[0] == T_IDENTIFIER:
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
       if next[1] == S_OANGLEBRACKETS:   # array
         self.next()
-        self.tagAsXml(self.token)
+        # self.tagAsXml(self.token)
         self.next()
         self.CompileExpression()      # expression
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
-        self.tagAsXml(self.token)
+        # self.tagAsXml(self.token)
       elif next[1] == S_POINT:          # subroutine call
         self.next()
-        self.tagAsXml(self.token)
+        # self.tagAsXml(self.token)
         self.next()
         if self.token[0] != T_IDENTIFIER:
           raise Exception("function identifier missing: " + self.token[1])
-        self.tagAsXml(self.token)
+        # self.tagAsXml(self.token)
         self.next()
         self.openBracket("term")
         self.next()
@@ -173,7 +182,7 @@ class CompilationEngine:
         self.closeBracket("term")
     elif self.token[0] == T_SYMBOL:
       if self.token[1] == S_MINUS or self.token[1] == S_TILDE:
-        self.tagAsXml(self.token)
+        # self.tagAsXml(self.token)
         self.next()
         self.CompileTerm()
       elif self.token[1] == S_OBRACKETS:
@@ -184,23 +193,23 @@ class CompilationEngine:
           self.closeBracket("unary op")
     else:
       raise Exception("term not compilable: " + self.token[1])
-    self.depth -= 1
-    self.tail(term, self.depth)   
+    # self.depth -= 1
+    # self.tail(term, self.depth)   
     
   # Compiles a comma-separated list of expressions
   def CompileExpressionList(self):
-    expressionList = "expressionList"
-    self.head(expressionList, self.depth)
-    self.depth += 1
-    self.newline()
+    # expressionList = "expressionList"
+    # self.head(expressionList, self.depth)
+    # self.depth += 1
+    # self.newline()
     if self.token[1] != S_CBRACKETS:
       self.CompileExpression()
     while (self.token[1] == S_KOMMA):
       self.tagAsXml(self.token)
       self.next()
       self.CompileExpression()
-    self.depth -= 1
-    self.tail(expressionList, self.depth)
+    # self.depth -= 1
+    # self.tail(expressionList, self.depth)
    
   # Compiles a possible emtpy parameter list
   #   Does not handle the enclosing "()"
@@ -277,10 +286,10 @@ class CompilationEngine:
   # Compiles a sequence of statements
   #    Does not handle the enclosing "{}"
   def compileStatements(self):
-    statements = "statements"
-    self.head(statements, self.depth)
-    self.depth += 1
-    self.newline()
+    # statements = "statements"
+    # self.head(statements, self.depth)
+    # self.depth += 1
+    # self.newline()
     # self.next()
     while (self.token[1] != S_CCURLYBRACKETS):
       if self.token[1] == K_LET:
@@ -294,8 +303,8 @@ class CompilationEngine:
       elif self.token[1] == K_RETURN:
         self.compileReturn()
       self.next()
-    self.depth -= 1
-    self.tail(statements, self.depth)
+    # self.depth -= 1
+    # self.tail(statements, self.depth)
   
   # Compiles a let statement
   def compileLet(self):
@@ -376,32 +385,28 @@ class CompilationEngine:
     
   # Compiles a do statement
   def compileDo(self):
-    doStatement = "doStatement"
-    self.head(doStatement, self.depth)
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
     self.next()
     self.checkIdentifier("doStatement identifier missing")
-    self.tagAsXml(self.token)
+    funcName = self.token[1]
     self.next()
     if self.token[1] == S_POINT:
-      self.tagAsXml(self.token)
       self.next()
       self.checkIdentifier("doStatement subroutine identifier missing")
-      self.tagAsXml(self.token)
+      funcName += "." + self.token[1]
       self.next()
     self.openBracket("doStatement")
     self.next()
     self.CompileExpressionList()
+    
+    #TODO push arguments on stack
+    
     self.closeBracket("doStatement")
     self.next()
     if self.token[1] != S_SEMICOLON:
       raise Exception("doStatement semicolon missing: " + self.token[1])
-    self.tagAsXml(self.token)
-    self.depth -= 1
-    self.tail(doStatement, self.depth)
     
+    self.vmWriter.writeCall(funcName, 2)
+      
   # Compiles a return statemetn
   def compileReturn(self):
     returnStatement = "returnStatement"
