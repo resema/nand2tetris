@@ -152,6 +152,8 @@ class CompilationEngine:
       self.vmWriter.writePush(kind, idx)
     elif self.token[1] == K_THIS or self.token[1] == K_NULL or self.token[1] == K_TRUE or self.token[1] == K_FALSE:
       # self.tagAsXml(self.token)
+      
+      #TODO adapt to specific case
       kind = self.subroutineTable.KindOf(self.token[1])
       idx = self.subroutineTable.IndexOf(self.token[1])
       if kind == -1:
@@ -405,6 +407,7 @@ class CompilationEngine:
     if self.token[1] != S_SEMICOLON:
       raise Exception("doStatement semicolon missing: " + self.token[1])
     
+    #TODO missing nArgs from expression list
     self.vmWriter.writeCall(funcName, 2)
       
   # Compiles a return statemetn
