@@ -117,7 +117,7 @@ symbolList = {
 # virtual memory type and additional segments
 STATIC  = "static"
 FIELD   = "field"
-LOCAL   = "var"
+LOCAL   = "local"
 ARG     = "argument" 
 CONST   = "const"
 THIS    = "this"

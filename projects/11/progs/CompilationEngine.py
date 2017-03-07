@@ -88,7 +88,6 @@ class CompilationEngine:
       self.next()
       self.classTable.define(name, type, kind)
       self.vmWriter.writePush(self.classTable.KindOf(name), self.classTable.IndexOf(name))
-    self.depth -= 1
     
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
@@ -247,34 +246,33 @@ class CompilationEngine:
   def compileVarDec(self):
     self.next()
     if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
-      # self.tagAsXml(self.token)
       type = self.token[1]
       self.next()
     else:
       raise Exception("varDec type missing: " + self.token[1])
     if self.token[0] == T_IDENTIFIER:
-      # self.tagAsXml(self.token)
       name = self.token[1]
       self.next()
     else:
       raise Exception("varDec identifier missing: " + self.token[1])
+    
     self.subroutineTable.define(name, type, LOCAL)
+    self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
+
     while (self.token[1] != S_SEMICOLON):
       if self.token[1] != S_KOMMA:
         raise Exception("varDec initializer list komma missing: " + self.token[1])
-      # self.tagAsXml(self.token)
       self.next()
       if self.token[0] != T_IDENTIFIER:
         raise Exception("varDec identifier missing: " + self.token[1])
-      # self.tagAsXml(self.token)
       name = self.token[1]
       self.next()
       self.subroutineTable.define(name, type, LOCAL)
+      self.subroutineTable.define(name, type, LOCAL)
+      self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
+
     if self.token[1] != S_SEMICOLON:
       raise Exception("varDec semicolon missing: " + self.token[1])
-    # self.tagAsXml(self.token)
-    # self.depth -= 1
-    # self.tail(varDec, self.depth)
     
   # Compiles a sequence of statements
   #    Does not handle the enclosing "{}"

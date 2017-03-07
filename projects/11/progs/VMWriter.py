@@ -46,7 +46,7 @@ class VMWriter:
     
   # Writes a VM function command
   def writeFunction(self, name, nLocals):
-    self.fobj_out.write("function" + " " + name + " " + str(nLocals))
+    self.fobj_out.write("function" + " " + name + " " + str(nLocals) + "\n")
     
   # Writes a VM return command
   def writeReturn(self):
