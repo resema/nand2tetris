@@ -14,23 +14,23 @@ class VMWriter:
   
   # cstor
   def __init__(self, fobj_out):
-    self fobj_out = fobj_out
+    self.fobj_out = fobj_out
     
   # Writes a VM push command
   def writePush(self, segment, idx):
-    pass
+    self.fobj_out.write("push" + " " + str(segment) + " " + str(idx) + "\n")
     
   # Writes a VM pop command
   def writePop(self, segment, idx):
-    pass
+    self.fobj_out.write("pop" + " " + str(segment) + " " + str(idx) + "\n")
     
   # Writes a VM arithmetic-logical command
   def writeArithmetic(self, command):
-    pass
+    self.fobj_out.write(command + "\n")
     
   # Writes a VM label command
   def writeLabel(self, label):
-    pass
+    self.fobj_out.write("label" + " " + str(label))
     
   # Writes a VM goto command
   def writeGoto(self, label):
@@ -46,7 +46,7 @@ class VMWriter:
     
   # Writes a VM function command
   def writeFunction(self, name, nLocals):
-    pass
+    self.fobj_out.write("function" + " " + name + " " + str(nLocals))
     
   # Writes a VM return command
   def writeReturn(self):

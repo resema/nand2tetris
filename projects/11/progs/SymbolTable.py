@@ -30,6 +30,10 @@ class SymbolTable:
   # Give the table an identifier name
   def setName(self, tableName):
     self.tableName = tableName
+  
+  # Return the table identifier name
+  def getName(self):
+    return self.tableName
     
   # Adds a new identifier and assigns a running index
   def define(self, name, type, kind):
@@ -54,25 +58,25 @@ class SymbolTable:
   # Returns the kind of the named identifier
   def KindOf(self, name):
     kind = -1
-    entry = findEntry(name)
+    entry = self.findEntry(name)
     if entry != []:
-      kind =  entry[2]
+      kind =  entry[1]
     return kind
     
   # Returns the type of the named identifier
   def TypeOf(self, name):
     type = ""
-    entry = findEntry(name)
+    entry = self.findEntry(name)
     if entry != []:
-      type = entry[2]
+      type = entry[1]
     return type
     
   # Returns the index assigned to the named identifier
   def IndexOf(self, name):
     idx = -1
-    entry = findEntry(name)
+    entry = self.findEntry(name)
     if entry != []:
-      idx = entry[3]
+      idx = entry[2]
     return idx
     
   #......................................................
