@@ -10,6 +10,8 @@
 #
 #***********************************************************
 
+from Defines import *
+
 class VMWriter:
   
   # cstor
@@ -26,11 +28,14 @@ class VMWriter:
     
   # Writes a VM arithmetic-logical command
   def writeArithmetic(self, command):
-    self.fobj_out.write(command + "\n")
+    if command == S_STAR:
+      self.fobj_out.write("call Sys.Mult 2" + "\n")
+    elif command == S_PLUS:
+      self.fobj_out.write("add" + "\n")
     
   # Writes a VM label command
   def writeLabel(self, label):
-    self.fobj_out.write("label" + " " + str(label))
+    self.fobj_out.write("label" + " " + str(label) + "\n")
     
   # Writes a VM goto command
   def writeGoto(self, label):
@@ -50,7 +55,7 @@ class VMWriter:
     
   # Writes a VM return command
   def writeReturn(self):
-    pass
+    self.fobj_out.write("return" + "\n")
     
   # Closes the output file
   def close(self):

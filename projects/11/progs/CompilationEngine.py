@@ -116,22 +116,16 @@ class CompilationEngine:
   # Compiles an expression and returns a semicolon as token
   #  TODO returns already the next token
   def CompileExpression(self):
-    # expression = "expression"
-    # self.head(expression, self.depth)
-    # self.depth += 1
-    # self.newline()
     self.CompileTerm()
     self.next()
     while (self.token[1] == S_PLUS or self.token[1] == S_MINUS or self.token[1] == S_STAR or
            self.token[1] == S_SLASH or self.token[1] == S_AMPERSAND or self.token[1] == S_PIPE or
            self.token[1] == S_LESSTHAN or self.token[1] == S_GREATERTHAN or self.token[1] == S_EQUALS):
-      if self.token[0] == T_SYMBOL:
-        # self.tagAsXml(self.token)               # op 
-        self.next()
+      opToken = self.token
+      self.next()
       self.CompileTerm()
       self.next()
-    # self.depth -= 1
-    # self.tail(expression, self.depth)
+      self.vmWriter.writeArithmetic(opToken[1])
     
   # Compiles a term
   #   If the token is an identifier, the routine must distinguish beteen a variable,
@@ -141,7 +135,7 @@ class CompilationEngine:
   #   Any other token is not part of this term
   def CompileTerm(self):
     # term = "term"
-    # next = self.peek()
+    next = self.peek()
     # self.head(term, self.depth)
     # self.depth += 1
     # self.newline()
@@ -200,20 +194,18 @@ class CompilationEngine:
     
   # Compiles a comma-separated list of expressions
   def CompileExpressionList(self):
-    # expressionList = "expressionList"
-    # self.head(expressionList, self.depth)
-    # self.depth += 1
-    # self.newline()
+    nbrOfArg = 0
     if self.token[1] != S_CBRACKETS:
       self.CompileExpression()
+      nbrOfArg += 1
     while (self.token[1] == S_KOMMA):
       self.tagAsXml(self.token)
       self.next()
       self.CompileExpression()
-    # self.depth -= 1
-    # self.tail(expressionList, self.depth)
+      nbrOfArg += 1
+    return nbrOfArg
    
-  # Compiles a possible emtpy parameter list
+  # Compiles a possible empty parameter list
   #   Does not handle the enclosing "()"
   #   Returns the number of function arguments
   def compileParameterList(self):
@@ -398,9 +390,9 @@ class CompilationEngine:
       self.next()
     self.openBracket("doStatement")
     self.next()
-    self.CompileExpressionList()
+    nbrOfArg = self.CompileExpressionList()
     
-    #TODO push arguments on stack
+    # #TODO push arguments on stack
     
     self.closeBracket("doStatement")
     self.next()
@@ -408,24 +400,18 @@ class CompilationEngine:
       raise Exception("doStatement semicolon missing: " + self.token[1])
     
     #TODO missing nArgs from expression list
-    self.vmWriter.writeCall(funcName, 2)
+    self.vmWriter.writeCall(funcName, nbrOfArg)
       
   # Compiles a return statemetn
   def compileReturn(self):
-    returnStatement = "returnStatement"
-    self.head(returnStatement, self.depth)
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
     self.next()
     if self.token[1] != S_SEMICOLON: 
       self.CompileExpression()
+    else:
+      self.vmWriter.writePush("constant", 0)
     if self.token[1] != S_SEMICOLON:
       raise Exception("returnStatement semicolon missing: " + self.token[1])
-    self.tagAsXml(self.token)
-    self.depth -= 1
-    self.tail(returnStatement, self.depth)
-    
+    self.vmWriter.writeReturn()
  
   #.................................................
   # compilation helps
