@@ -134,13 +134,8 @@ class CompilationEngine:
   #   distinguish between the possibilities.
   #   Any other token is not part of this term
   def CompileTerm(self):
-    # term = "term"
     next = self.peek()
-    # self.head(term, self.depth)
-    # self.depth += 1
-    # self.newline()
     if self.token[0] == T_INT_CONST or self.token[0] == T_STRING_CONST:
-      # self.tagAsXml(self.token)
       kind = "constant"
       idx = self.token[1]
       self.vmWriter.writePush(kind, idx)
@@ -155,7 +150,7 @@ class CompilationEngine:
         idx = self.classTable.IndexOf(self.token[1])
       self.vmWriter.writePush(kind, idx)
     elif self.token[0] == T_IDENTIFIER:
-      # self.tagAsXml(self.token)
+      funcName = self.token[1]
       if next[1] == S_OANGLEBRACKETS:   # array
         self.next()
         # self.tagAsXml(self.token)
@@ -171,11 +166,20 @@ class CompilationEngine:
         if self.token[0] != T_IDENTIFIER:
           raise Exception("function identifier missing: " + self.token[1])
         # self.tagAsXml(self.token)
+        funcName += "." + self.token[1]
         self.next()
         self.openBracket("term")
         self.next()
-        self.CompileExpressionList()
+        nbrOfArg = self.CompileExpressionList()
         self.closeBracket("term")
+        self.vmWriter.writeCall(funcName, nbrOfArg)
+      else:
+        kind = self.subroutineTable.KindOf(self.token[1])
+        idx = self.subroutineTable.IndexOf(self.token[1])
+        if kind == -1:
+          kind = self.classTable.KindOf(self.token[1])
+          idx = self.classTable.IndexOf(self.token[1])
+        self.vmWriter.writePush(kind, idx)
     elif self.token[0] == T_SYMBOL:
       if self.token[1] == S_MINUS or self.token[1] == S_TILDE:
         # self.tagAsXml(self.token)
@@ -257,11 +261,8 @@ class CompilationEngine:
       name = self.token[1]
       self.next()
     else:
-      raise Exception("varDec identifier missing: " + self.token[1])
-    
+      raise Exception("varDec identifier missing: " + self.token[1])      
     self.subroutineTable.define(name, type, LOCAL)
-    self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
-
     while (self.token[1] != S_SEMICOLON):
       if self.token[1] != S_KOMMA:
         raise Exception("varDec initializer list komma missing: " + self.token[1])
@@ -271,20 +272,12 @@ class CompilationEngine:
       name = self.token[1]
       self.next()
       self.subroutineTable.define(name, type, LOCAL)
-      self.subroutineTable.define(name, type, LOCAL)
-      self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
-
     if self.token[1] != S_SEMICOLON:
       raise Exception("varDec semicolon missing: " + self.token[1])
     
   # Compiles a sequence of statements
   #    Does not handle the enclosing "{}"
   def compileStatements(self):
-    # statements = "statements"
-    # self.head(statements, self.depth)
-    # self.depth += 1
-    # self.newline()
-    # self.next()
     while (self.token[1] != S_CCURLYBRACKETS):
       if self.token[1] == K_LET:
         self.compileLet()
@@ -297,39 +290,39 @@ class CompilationEngine:
       elif self.token[1] == K_RETURN:
         self.compileReturn()
       self.next()
-    # self.depth -= 1
-    # self.tail(statements, self.depth)
   
   # Compiles a let statement
   def compileLet(self):
-    letStatement = "letStatement"
-    self.head(letStatement, self.depth)
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
+    # letStatement = "letStatement"
+    # self.head(letStatement, self.depth)
+    # self.depth += 1
+    # self.newline()
+    # self.tagAsXml(self.token)
     self.next()
     self.checkIdentifier("letStatement identifier missing")
-    self.tagAsXml(self.token)
+    varName = self.token[1]
+    # self.tagAsXml(self.token)
     self.next()    
     if self.token[0] == T_SYMBOL:
       if self.token[1] == S_OANGLEBRACKETS:
-        self.tagAsXml(self.token)
+        # self.tagAsXml(self.token)
         self.next()
         self.CompileExpression()    # expression
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
-        self.tagAsXml(self.token)
+        # self.tagAsXml(self.token)
         self.next()
     if self.token[1] != S_EQUALS:   # equal sign
       raise Exception("letStatement equal symbol missing: " + self.token[1])
-    self.tagAsXml(self.token)
+    # self.tagAsXml(self.token)
     self.next()
     self.CompileExpression()        # expression
     if self.token[1] != S_SEMICOLON:
       raise Exception("letStatement semicolon missing: " + self.token[1])
-    self.tagAsXml(self.token)
-    self.depth -= 1
-    self.tail(letStatement, self.depth)
+    # self.tagAsXml(self.token)
+    # self.depth -= 1
+    # self.tail(letStatement, self.depth)
+    self.vmWriter.writePop(self.subroutineTable.KindOf(varName), self.subroutineTable.IndexOf(varName))
     
   # Compiles an if statement
   def compileIf(self):
@@ -357,7 +350,7 @@ class CompilationEngine:
       self.compileStatements()
       self.closeCurlyBracket("elseStatement")
     self.tail(ifStatement, self.depth)
-    
+      
   # Compiles a while statement
   def compileWhile(self):
     whileStatement = "whileStatement"
@@ -391,15 +384,10 @@ class CompilationEngine:
     self.openBracket("doStatement")
     self.next()
     nbrOfArg = self.CompileExpressionList()
-    
-    # #TODO push arguments on stack
-    
     self.closeBracket("doStatement")
     self.next()
     if self.token[1] != S_SEMICOLON:
       raise Exception("doStatement semicolon missing: " + self.token[1])
-    
-    #TODO missing nArgs from expression list
     self.vmWriter.writeCall(funcName, nbrOfArg)
       
   # Compiles a return statemetn
