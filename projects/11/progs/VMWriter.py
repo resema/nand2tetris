@@ -29,9 +29,13 @@ class VMWriter:
   # Writes a VM arithmetic-logical command
   def writeArithmetic(self, command):
     if command == S_STAR:
-      self.fobj_out.write("call Sys.Mult 2" + "\n")
+      self.fobj_out.write("call Math.multiply 2" + "\n")
+    elif command == S_SLASH:
+      self.obj_out.write("call Math.divide 2" + "\n")
     elif command == S_PLUS:
       self.fobj_out.write("add" + "\n")
+    elif command == S_MINUS:
+      self.fobj_out.write("sub" + "\n")
     
   # Writes a VM label command
   def writeLabel(self, label):
