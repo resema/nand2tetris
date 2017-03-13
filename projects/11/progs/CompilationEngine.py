@@ -139,9 +139,13 @@ class CompilationEngine:
       kind = "constant"
       idx = self.token[1]
       self.vmWriter.writePush(kind, idx)
-    elif self.token[1] == K_THIS or self.token[1] == K_NULL or self.token[1] == K_TRUE or self.token[1] == K_FALSE:
-      # self.tagAsXml(self.token)
-      
+    elif self.token[1] == K_TRUE: 
+      kind = "constant"
+      self.vmWriter.writePush(kind, -1)
+    elif self.token[1] == K_FALSE:
+      kind = "constant"
+      self.vmWriter.writePush(kind, 0)
+    elif self.token[1] == K_THIS or self.token[1] == K_NULL:
       #TODO adapt to specific case
       kind = self.subroutineTable.KindOf(self.token[1])
       idx = self.subroutineTable.IndexOf(self.token[1])
@@ -161,11 +165,9 @@ class CompilationEngine:
         # self.tagAsXml(self.token)
       elif next[1] == S_POINT:          # subroutine call
         self.next()
-        # self.tagAsXml(self.token)
         self.next()
         if self.token[0] != T_IDENTIFIER:
           raise Exception("function identifier missing: " + self.token[1])
-        # self.tagAsXml(self.token)
         funcName += "." + self.token[1]
         self.next()
         self.openBracket("term")
@@ -193,8 +195,6 @@ class CompilationEngine:
           self.closeBracket("unary op")
     else:
       raise Exception("term not compilable: " + self.token[1])
-    # self.depth -= 1
-    # self.tail(term, self.depth)   
     
   # Compiles a comma-separated list of expressions
   def CompileExpressionList(self):
@@ -221,7 +221,7 @@ class CompilationEngine:
       self.checkIdentifier("parameterList first identifier missing")
       name = self.token[1]
       self.subroutineTable.define(name, type, ARG)
-      self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
+      # self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
       nbrOfArg += 1
       self.next()
     while (self.token[1] == S_KOMMA):
@@ -233,7 +233,7 @@ class CompilationEngine:
       self.checkIdentifier("parameterList identifier missing")
       name = self.token[1]
       self.subroutineTable.define(name, type, ARG)
-      self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
+      # self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
       nbrOfArg += 1
       self.next()
     return nbrOfArg
