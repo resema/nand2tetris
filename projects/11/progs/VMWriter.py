@@ -51,7 +51,7 @@ class VMWriter:
     
   # Writes a VM if-goto command
   def writeIf(self, label):
-    pass
+    self.fobj_out.write("if-goto" + " " + label + "\n")
     
   # Writes a VM call command
   def writeCall(self, label, nArgs):
