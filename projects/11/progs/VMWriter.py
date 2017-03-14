@@ -36,14 +36,18 @@ class VMWriter:
       self.fobj_out.write("add" + "\n")
     elif command == S_MINUS:
       self.fobj_out.write("sub" + "\n")
+    elif command == S_LESSTHAN:
+      self.fobj_out.write("lt" + "\n")
+    elif command == S_GREATERTHAN:
+      self.fobj_out.write("gt" + "\n")
     
   # Writes a VM label command
   def writeLabel(self, label):
-    self.fobj_out.write("label" + " " + str(label) + "\n")
+    self.fobj_out.write("label" + " " + label + "\n")
     
   # Writes a VM goto command
   def writeGoto(self, label):
-    pass
+    self.fobj_out.write("goto" + " " + label + "\n")
     
   # Writes a VM if-goto command
   def writeIf(self, label):

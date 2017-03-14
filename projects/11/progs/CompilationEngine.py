@@ -27,6 +27,7 @@ class CompilationEngine:
     self.classTable = SymbolTable.SymbolTable()
     self.subroutineTable = SymbolTable.SymbolTable()
     self.className = ""
+    self.nbrOfLabel = 0;
     
   def run(self):
     while (len(self.listOfTokens) > 0):
@@ -353,22 +354,28 @@ class CompilationEngine:
       
   # Compiles a while statement
   def compileWhile(self):
-    whileStatement = "whileStatement"
-    self.head(whileStatement, self.depth)
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
+    # whileStatement = "whileStatement"
+    # self.head(whileStatement, self.depth)
+    # self.depth += 1
+    # self.newline()
+    # self.tagAsXml(self.token)
+    whileLbl = self.createUniqueLabel("WHILE")
+    exitLbl = self.createUniqueLabel("EXIT")
+    self.vmWriter.writeLabel(whileLbl)
     self.next()
     self.openBracket("whileStatement")
     self.next()
     self.CompileExpression()
     self.closeBracket("whileStatement")
+    self.vmWriter.writeGoto(exitLbl)
     self.next()
     self.openCurlyBracket("whileStatement")
     self.next()
     self.compileStatements()
     self.closeCurlyBracket("whileStatement")
-    self.tail(whileStatement, self.depth)
+    # self.tail(whileStatement, self.depth)
+    self.vmWriter.writeGoto(whileLbl)
+    self.vmWriter.writeLabel(exitLbl)
     
   # Compiles a do statement
   def compileDo(self):
@@ -434,6 +441,11 @@ class CompilationEngine:
     # self.tagAsXml(self.token)
     # self.depth -= 1
    
+  # increase the counter of the labels
+  def createUniqueLabel(self, identifier):
+    ident = identifier + "@" + str(self.nbrOfLabel)
+    self.nbrOfLabel += 1
+    return ident
    
   #.................................................
   # next token from listOfTokens
