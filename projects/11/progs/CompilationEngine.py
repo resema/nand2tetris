@@ -294,15 +294,9 @@ class CompilationEngine:
   
   # Compiles a let statement
   def compileLet(self):
-    # letStatement = "letStatement"
-    # self.head(letStatement, self.depth)
-    # self.depth += 1
-    # self.newline()
-    # self.tagAsXml(self.token)
     self.next()
     self.checkIdentifier("letStatement identifier missing")
     varName = self.token[1]
-    # self.tagAsXml(self.token)
     self.next()    
     if self.token[0] == T_SYMBOL:
       if self.token[1] == S_OANGLEBRACKETS:
@@ -315,53 +309,50 @@ class CompilationEngine:
         self.next()
     if self.token[1] != S_EQUALS:   # equal sign
       raise Exception("letStatement equal symbol missing: " + self.token[1])
-    # self.tagAsXml(self.token)
     self.next()
     self.CompileExpression()        # expression
     if self.token[1] != S_SEMICOLON:
       raise Exception("letStatement semicolon missing: " + self.token[1])
-    # self.tagAsXml(self.token)
-    # self.depth -= 1
-    # self.tail(letStatement, self.depth)
     self.vmWriter.writePop(self.subroutineTable.KindOf(varName), self.subroutineTable.IndexOf(varName))
     
   # Compiles an if statement
   def compileIf(self):
-    ifStatement = "ifStatement"
-    self.head(ifStatement, self.depth)
-    self.depth += 1
-    self.newline()
-    self.tagAsXml(self.token)
+    ifLbl = self.createLabel("IF")
+    elseLbl = self.createLabel("ELSE")
+    exitLbl = self.createLabel("EXIT")
+    self.increaseLabelCounter()
+    
     self.next()
     self.openBracket("ifStatement")
     self.next()
     self.CompileExpression()
+    self.vmWriter.writeIf(ifLbl)
+    self.vmWriter.writeGoto(elseLbl)
+    self.vmWriter.writeLabel(ifLbl)
     self.closeBracket("ifStatement")
     self.next()
     self.openCurlyBracket("ifStatement")
     self.next()
     self.compileStatements()
+    self.vmWriter.writeGoto(exitLbl)
     self.closeCurlyBracket("ifStatement")
+    self.vmWriter.writeLabel(elseLbl)
     if self.peek()[1] == K_ELSE:
       self.next()
-      self.tagAsXml(self.token)
       self.next()
       self.openCurlyBracket("elseStatement")
       self.next()
       self.compileStatements()
       self.closeCurlyBracket("elseStatement")
-    self.tail(ifStatement, self.depth)
+    self.vmWriter.writeLabel(exitLbl)
       
   # Compiles a while statement
   def compileWhile(self):
-    # whileStatement = "whileStatement"
-    # self.head(whileStatement, self.depth)
-    # self.depth += 1
-    # self.newline()
-    # self.tagAsXml(self.token)
-    whileLbl = self.createUniqueLabel("WHILE")
-    continueLbl = self.createUniqueLabel("CONTINUE")
-    exitLbl = self.createUniqueLabel("EXIT")
+    whileLbl = self.createLabel("WHILE")
+    continueLbl = self.createLabel("CONTINUE")
+    exitLbl = self.createLabel("EXIT")
+    self.increaseLabelCounter()
+    
     self.vmWriter.writeLabel(whileLbl)
     self.next()
     self.openBracket("whileStatement")
@@ -376,7 +367,6 @@ class CompilationEngine:
     self.next()
     self.compileStatements()
     self.closeCurlyBracket("whileStatement")
-    # self.tail(whileStatement, self.depth)
     self.vmWriter.writeGoto(whileLbl)
     self.vmWriter.writeLabel(exitLbl)
     
@@ -445,10 +435,13 @@ class CompilationEngine:
     # self.depth -= 1
    
   # increase the counter of the labels
-  def createUniqueLabel(self, identifier):
-    ident = identifier + "@" + str(self.nbrOfLabel)
+  def increaseLabelCounter(self):
     self.nbrOfLabel += 1
-    return ident
+    
+  def createLabel(self, identifier):
+    return identifier + "@" + str(self.nbrOfLabel)
+    
+  
    
   #.................................................
   # next token from listOfTokens

@@ -40,6 +40,8 @@ class VMWriter:
       self.fobj_out.write("lt" + "\n")
     elif command == S_GREATERTHAN:
       self.fobj_out.write("gt" + "\n")
+    elif command == S_EQUALS:
+      self.fobj_out.write("eq" + "\n")
     
   # Writes a VM label command
   def writeLabel(self, label):
