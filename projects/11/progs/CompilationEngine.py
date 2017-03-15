@@ -119,6 +119,10 @@ class CompilationEngine:
   def CompileExpression(self):
     self.CompileTerm()
     self.next()
+    # #TODO find better way
+    # if self.token[1] == S_CBRACKETS:
+      # self.vmWriter.writeArithmetic(S_NOT)
+      # self.vmWriter.writeArithmetic(S_EQUALS)
     while (self.token[1] == S_PLUS or self.token[1] == S_MINUS or self.token[1] == S_STAR or
            self.token[1] == S_SLASH or self.token[1] == S_AMPERSAND or self.token[1] == S_PIPE or
            self.token[1] == S_LESSTHAN or self.token[1] == S_GREATERTHAN or self.token[1] == S_EQUALS):
@@ -127,7 +131,7 @@ class CompilationEngine:
       self.CompileTerm()
       self.next()
       self.vmWriter.writeArithmetic(opToken[1])
-    
+        
   # Compiles a term
   #   If the token is an identifier, the routine must distinguish beteen a variable,
   #   an array entry or a subroutine call.
@@ -142,10 +146,11 @@ class CompilationEngine:
       self.vmWriter.writePush(kind, idx)
     elif self.token[1] == K_TRUE: 
       kind = "constant"
-      self.vmWriter.writePush(kind, -1)
+      self.vmWriter.writePush(kind, 0)
     elif self.token[1] == K_FALSE:
       kind = "constant"
       self.vmWriter.writePush(kind, 0)
+      self.vmWriter.writeArithmetic(S_NOT)
     elif self.token[1] == K_THIS or self.token[1] == K_NULL:
       #TODO adapt to specific case
       kind = self.subroutineTable.KindOf(self.token[1])

@@ -126,15 +126,15 @@ POINTER = "pointer"
 TEMP    = "temp"
 
 # arithmetic logical commands
-ADD     = "add"
-SUB     = "sub"
-NEG     = "neg"
-EQ      = "eq"
-GT      = "gt"
-LT      = "lt"
-AND     = "and"
-OR      = "or"
-NOT     = "not"
+# ADD     = "add"
+# SUB     = "sub"
+# NEG     = "neg"
+# EQ      = "eq"
+# GT      = "gt"
+# LT      = "lt"
+# AND     = "and"
+# OR      = "or"
+S_NOT     = "not"
 
 
 
