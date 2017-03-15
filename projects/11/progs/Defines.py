@@ -128,7 +128,7 @@ TEMP    = "temp"
 # arithmetic logical commands
 # ADD     = "add"
 # SUB     = "sub"
-# NEG     = "neg"
+S_NEG     = "neg"
 # EQ      = "eq"
 # GT      = "gt"
 # LT      = "lt"

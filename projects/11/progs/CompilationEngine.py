@@ -92,6 +92,10 @@ class CompilationEngine:
     
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
+    if self.token[1] == K_METHOD:
+      methodFlag = 1
+    else:
+      methodFlag = 0
     self.next()
     if not (self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER):
       raise Exception("subroutine keyword missing: " + self.token[0] + ", " + self.token[1])
@@ -101,7 +105,8 @@ class CompilationEngine:
     # new subroutine symbol table with this
     self.subroutineTable = SymbolTable.SymbolTable()
     self.subroutineTable.setName(self.token[1])
-    self.subroutineTable.define(K_THIS, self.className, ARG)
+    if methodFlag:
+      self.subroutineTable.define(K_THIS, self.className, ARG)
         
     self.next()
     self.openBracket("subroutine decl")  
@@ -110,6 +115,12 @@ class CompilationEngine:
     #TODO Argument have to be pushed on the stack first
     functionName = self.classTable.getName() + "." + self.subroutineTable.getName()
     self.vmWriter.writeFunction(functionName, nbrOfArg)
+    #TODO pop THIS pointer to argument
+    if methodFlag:
+      self.vmWriter.writePush("pointer", 0) #THIS
+      self.vmWriter.writePop("argument", 0)
+    for idx in range(nbrOfArg):
+      self.vmWriter.writePush("argument", idx) #TODO this is missing
     
     self.closeBracket("subroutine decl")
     self.compileSubroutineBody()  # subroutine body
@@ -189,10 +200,16 @@ class CompilationEngine:
           idx = self.classTable.IndexOf(self.token[1])
         self.vmWriter.writePush(kind, idx)
     elif self.token[0] == T_SYMBOL:
-      if self.token[1] == S_MINUS or self.token[1] == S_TILDE:
+      if self.token[1] == S_TILDE:
         # self.tagAsXml(self.token)
+        notToken = self.token
         self.next()
         self.CompileTerm()
+        self.vmWriter.writeArithmetic(notToken[1])
+      elif self.token[1] == S_MINUS:
+        self.next()
+        self.CompileTerm()
+        self.vmWriter.writeArithmetic(S_NEG)
       elif self.token[1] == S_OBRACKETS:
         self.openBracket("unary op")
         self.next()
@@ -209,7 +226,7 @@ class CompilationEngine:
       self.CompileExpression()
       nbrOfArg += 1
     while (self.token[1] == S_KOMMA):
-      self.tagAsXml(self.token)
+      # self.tagAsXml(self.token)
       self.next()
       self.CompileExpression()
       nbrOfArg += 1
@@ -227,7 +244,6 @@ class CompilationEngine:
       self.checkIdentifier("parameterList first identifier missing")
       name = self.token[1]
       self.subroutineTable.define(name, type, ARG)
-      # self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
       nbrOfArg += 1
       self.next()
     while (self.token[1] == S_KOMMA):
@@ -239,7 +255,6 @@ class CompilationEngine:
       self.checkIdentifier("parameterList identifier missing")
       name = self.token[1]
       self.subroutineTable.define(name, type, ARG)
-      # self.vmWriter.writePush(self.subroutineTable.KindOf(name), self.subroutineTable.IndexOf(name))
       nbrOfArg += 1
       self.next()
     return nbrOfArg
