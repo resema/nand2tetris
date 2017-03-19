@@ -53,7 +53,7 @@ if __name__ == "__main__":
     path = file.split(".")
     noExt = path[-2]
     filename = noExt + ".vm"
-    print(filename)
+    # print(filename)
     fobj_in = open(file)
     fobj_out = open(filename, 'w')
     

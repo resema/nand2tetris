@@ -42,6 +42,10 @@ class VMWriter:
       self.fobj_out.write("gt" + "\n")
     elif command == S_EQUALS:
       self.fobj_out.write("eq" + "\n")
+    elif command == S_AMPERSAND:
+      self.fobj_out.write("and" + "\n")
+    elif command == S_PIPE:
+      self.fobj_out.write("or" + "\n")
     elif command == S_NOT:
       self.fobj_out.write("not" + "\n")
     elif command == S_TILDE:

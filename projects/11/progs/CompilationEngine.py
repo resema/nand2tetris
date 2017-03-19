@@ -93,9 +93,9 @@ class CompilationEngine:
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
     if self.token[1] == K_METHOD:
-      methodFlag = 1
+      self.methodFlag = 1
     else:
-      methodFlag = 0
+      self.methodFlag = 0
     self.next()
     if not (self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER):
       raise Exception("subroutine keyword missing: " + self.token[0] + ", " + self.token[1])
@@ -105,23 +105,13 @@ class CompilationEngine:
     # new subroutine symbol table with this
     self.subroutineTable = SymbolTable.SymbolTable()
     self.subroutineTable.setName(self.token[1])
-    if methodFlag:
+    if self.methodFlag:
       self.subroutineTable.define(K_THIS, self.className, ARG)
         
     self.next()
     self.openBracket("subroutine decl")  
-    nbrOfArg = self.compileParameterList()   # parameter list
-    
-    #TODO Argument have to be pushed on the stack first
-    functionName = self.classTable.getName() + "." + self.subroutineTable.getName()
-    self.vmWriter.writeFunction(functionName, nbrOfArg)
-    #TODO pop THIS pointer to argument
-    if methodFlag:
-      self.vmWriter.writePush("pointer", 0) #THIS
-      self.vmWriter.writePop("argument", 0)
-    for idx in range(nbrOfArg):
-      self.vmWriter.writePush("argument", idx) #TODO this is missing
-    
+    self.nbrOfArg = self.compileParameterList()   # parameter list
+    self.functionName = self.classTable.getName() + "." + self.subroutineTable.getName()    
     self.closeBracket("subroutine decl")
     self.compileSubroutineBody()  # subroutine body
     
@@ -130,10 +120,7 @@ class CompilationEngine:
   def CompileExpression(self):
     self.CompileTerm()
     self.next()
-    # #TODO find better way
-    # if self.token[1] == S_CBRACKETS:
-      # self.vmWriter.writeArithmetic(S_NOT)
-      # self.vmWriter.writeArithmetic(S_EQUALS)
+
     while (self.token[1] == S_PLUS or self.token[1] == S_MINUS or self.token[1] == S_STAR or
            self.token[1] == S_SLASH or self.token[1] == S_AMPERSAND or self.token[1] == S_PIPE or
            self.token[1] == S_LESSTHAN or self.token[1] == S_GREATERTHAN or self.token[1] == S_EQUALS):
@@ -158,10 +145,10 @@ class CompilationEngine:
     elif self.token[1] == K_TRUE: 
       kind = "constant"
       self.vmWriter.writePush(kind, 0)
+      self.vmWriter.writeArithmetic(S_NOT)
     elif self.token[1] == K_FALSE:
       kind = "constant"
       self.vmWriter.writePush(kind, 0)
-      self.vmWriter.writeArithmetic(S_NOT)
     elif self.token[1] == K_THIS or self.token[1] == K_NULL:
       #TODO adapt to specific case
       kind = self.subroutineTable.KindOf(self.token[1])
@@ -174,12 +161,10 @@ class CompilationEngine:
       funcName = self.token[1]
       if next[1] == S_OANGLEBRACKETS:   # array
         self.next()
-        # self.tagAsXml(self.token)
         self.next()
         self.CompileExpression()      # expression
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
-        # self.tagAsXml(self.token)
       elif next[1] == S_POINT:          # subroutine call
         self.next()
         self.next()
@@ -201,7 +186,6 @@ class CompilationEngine:
         self.vmWriter.writePush(kind, idx)
     elif self.token[0] == T_SYMBOL:
       if self.token[1] == S_TILDE:
-        # self.tagAsXml(self.token)
         notToken = self.token
         self.next()
         self.CompileTerm()
@@ -261,17 +245,25 @@ class CompilationEngine:
     
   # Compiles a subroutine's body
   def compileSubroutineBody(self):
+    nbrOfVarDec = 0
     self.next()
     self.openCurlyBracket("subroutine body")   
     self.next()
     while (self.token[1] == K_VAR):
-        self.compileVarDec()
+        nbrOfVarDec += self.compileVarDec()
         self.next()
+    self.vmWriter.writeFunction(self.functionName, nbrOfVarDec)
+    if self.methodFlag:
+      self.vmWriter.writePush("pointer", 0) #THIS
+      self.vmWriter.writePop("argument", 0)
+    for idx in range(self.nbrOfArg):
+      self.vmWriter.writePush("argument", idx) #TODO this is missing
     self.compileStatements()
     self.closeCurlyBracket("subroutine body")
     
   # Compiles a var declaration
   def compileVarDec(self):
+    nbrOfVarDec = 1
     self.next()
     if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
       type = self.token[1]
@@ -293,8 +285,10 @@ class CompilationEngine:
       name = self.token[1]
       self.next()
       self.subroutineTable.define(name, type, LOCAL)
+      nbrOfVarDec += 1
     if self.token[1] != S_SEMICOLON:
       raise Exception("varDec semicolon missing: " + self.token[1])
+    return nbrOfVarDec
     
   # Compiles a sequence of statements
   #    Does not handle the enclosing "{}"
@@ -345,7 +339,15 @@ class CompilationEngine:
     self.next()
     self.openBracket("ifStatement")
     self.next()
+    checkVar = False
+    if self.peek()[1] == S_CBRACKETS:
+      checkVar = True
     self.CompileExpression()
+    if checkVar:
+      kind = "constant"
+      self.vmWriter.writePush(kind, 0)
+      self.vmWriter.writeArithmetic(S_NOT)
+      self.vmWriter.writeArithmetic(S_EQUALS)
     self.vmWriter.writeIf(ifLbl)
     self.vmWriter.writeGoto(elseLbl)
     self.vmWriter.writeLabel(ifLbl)
@@ -377,7 +379,15 @@ class CompilationEngine:
     self.next()
     self.openBracket("whileStatement")
     self.next()
+    checkVar = False
+    if self.peek()[1] == S_CBRACKETS:
+      checkVar = True
     self.CompileExpression()
+    if checkVar:
+      kind = "constant"
+      self.vmWriter.writePush(kind, 0)
+      self.vmWriter.writeArithmetic(S_NOT)
+      self.vmWriter.writeArithmetic(S_EQUALS)
     self.closeBracket("whileStatement")
     self.vmWriter.writeIf(continueLbl)
     self.vmWriter.writeGoto(exitLbl)
@@ -409,6 +419,7 @@ class CompilationEngine:
     if self.token[1] != S_SEMICOLON:
       raise Exception("doStatement semicolon missing: " + self.token[1])
     self.vmWriter.writeCall(funcName, nbrOfArg)
+    self.vmWriter.writePop("temp", 0)
       
   # Compiles a return statemetn
   def compileReturn(self):
