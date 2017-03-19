@@ -38,6 +38,7 @@ class CompilationEngine:
     
   # Compiles a complete class
   def CompileClass(self):
+    self.nbrOfClassVar = 0
     self.next()
     self.checkIdentifier("class name missing")
     self.className = self.token[1]
@@ -53,7 +54,7 @@ class CompilationEngine:
           #TODO Testing
           self.subroutineTable.printTable("Subroutine Symbol Table")
         elif self.token[1] == K_FIELD or self.token[1] == K_STATIC:
-          self.CompileClassVarDec()
+          self.nbrOfClassVar += self.CompileClassVarDec()
     self.closeCurlyBracket("class")
     
     #TODO Testing
@@ -61,9 +62,11 @@ class CompilationEngine:
     
   # Compiles a static variable declaration of a field declaration
   def CompileClassVarDec(self):
-    kind = self.token[1]    
-    self.next()
-    
+    if self.token[1] == K_FIELD:
+      kind = K_THIS
+    else:
+      kind = self.token[1]    
+    self.next()   
     # locals of type variable or class
     if self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER:
       type = self.token[1]
@@ -74,11 +77,9 @@ class CompilationEngine:
       name = self.token[1]
       self.next()
     else:
-      raise Exception("classVarDec identifier missing: " + self.token[1])
-    
+      raise Exception("classVarDec identifier missing: " + self.token[1])   
     self.classTable.define(name, type, kind)
-    self.vmWriter.writePush(self.classTable.KindOf(name), self.classTable.IndexOf(name))
-    
+    nbrOfClassVar = 1    
     while (self.token[1] != S_SEMICOLON):
       if self.token[1] != S_KOMMA:
         raise Exception("classVarDec initializer list komma missing: " + self.token[1])
@@ -88,29 +89,35 @@ class CompilationEngine:
       name = self.token[1]
       self.next()
       self.classTable.define(name, type, kind)
-      self.vmWriter.writePush(self.classTable.KindOf(name), self.classTable.IndexOf(name))
+      nbrOfClassVar += 1   
+    return nbrOfClassVar
     
   # Compiles a complete method, function or constructor
   def CompileSubroutineDec(self):
+    self.nbrOfArg = 0
     if self.token[1] == K_METHOD:
-      self.methodFlag = 1
+      self.methodFlag = K_METHOD
+    elif self.token[1] == K_CONSTRUCTOR:
+      self.methodFlag = K_CONSTRUCTOR
     else:
-      self.methodFlag = 0
+      self.methodFlag = K_FUNCTION
     self.next()
     if not (self.token[0] == T_KEYWORD or self.token[0] == T_IDENTIFIER):
       raise Exception("subroutine keyword missing: " + self.token[0] + ", " + self.token[1])
     self.next()
     self.checkIdentifier("subroutine identifier missing")
-
+    
     # new subroutine symbol table with this
     self.subroutineTable = SymbolTable.SymbolTable()
     self.subroutineTable.setName(self.token[1])
-    if self.methodFlag:
+    if self.methodFlag == K_METHOD:
       self.subroutineTable.define(K_THIS, self.className, ARG)
-        
+      self.nbrOfArg += 1
+    elif self.methodFlag == K_CONSTRUCTOR:
+      self.subroutineTable.define(K_THIS, self.className, "pointer")
     self.next()
     self.openBracket("subroutine decl")  
-    self.nbrOfArg = self.compileParameterList()   # parameter list
+    self.nbrOfArg += self.compileParameterList()   # parameter list
     self.functionName = self.classTable.getName() + "." + self.subroutineTable.getName()    
     self.closeBracket("subroutine decl")
     self.compileSubroutineBody()  # subroutine body
@@ -253,9 +260,13 @@ class CompilationEngine:
         nbrOfVarDec += self.compileVarDec()
         self.next()
     self.vmWriter.writeFunction(self.functionName, nbrOfVarDec)
-    if self.methodFlag:
+    if self.methodFlag == K_METHOD:
       self.vmWriter.writePush("pointer", 0) #THIS
       self.vmWriter.writePop("argument", 0)
+    elif self.methodFlag == K_CONSTRUCTOR:
+      self.vmWriter.writePush("constant", self.nbrOfClassVar)
+      self.vmWriter.writeCall("Memory.alloc", 1)
+      self.vmWriter.writePop("pointer", 0)
     for idx in range(self.nbrOfArg):
       self.vmWriter.writePush("argument", idx) #TODO this is missing
     self.compileStatements()
@@ -314,12 +325,10 @@ class CompilationEngine:
     self.next()    
     if self.token[0] == T_SYMBOL:
       if self.token[1] == S_OANGLEBRACKETS:
-        # self.tagAsXml(self.token)
         self.next()
         self.CompileExpression()    # expression
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
-        # self.tagAsXml(self.token)
         self.next()
     if self.token[1] != S_EQUALS:   # equal sign
       raise Exception("letStatement equal symbol missing: " + self.token[1])
@@ -327,7 +336,12 @@ class CompilationEngine:
     self.CompileExpression()        # expression
     if self.token[1] != S_SEMICOLON:
       raise Exception("letStatement semicolon missing: " + self.token[1])
-    self.vmWriter.writePop(self.subroutineTable.KindOf(varName), self.subroutineTable.IndexOf(varName))
+    kind = self.subroutineTable.KindOf(varName)
+    idx = self.subroutineTable.IndexOf(varName)
+    if kind == -1:
+      kind = self.classTable.KindOf(varName)
+      idx = self.classTable.IndexOf(varName)
+    self.vmWriter.writePop(kind, idx)
     
   # Compiles an if statement
   def compileIf(self):
