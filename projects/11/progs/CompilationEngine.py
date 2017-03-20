@@ -261,14 +261,14 @@ class CompilationEngine:
         self.next()
     self.vmWriter.writeFunction(self.functionName, nbrOfVarDec)
     if self.methodFlag == K_METHOD:
-      self.vmWriter.writePush("pointer", 0) #THIS
-      self.vmWriter.writePop("argument", 0)
+      self.vmWriter.writePush("argument", 0) #THIS
+      self.vmWriter.writePop("pointer", 0)
     elif self.methodFlag == K_CONSTRUCTOR:
       self.vmWriter.writePush("constant", self.nbrOfClassVar)
       self.vmWriter.writeCall("Memory.alloc", 1)
       self.vmWriter.writePop("pointer", 0)
-    for idx in range(self.nbrOfArg):
-      self.vmWriter.writePush("argument", idx) #TODO this is missing
+    # for idx in range(self.nbrOfArg):
+      # self.vmWriter.writePush("argument", idx) #TODO this is missing
     self.compileStatements()
     self.closeCurlyBracket("subroutine body")
     
