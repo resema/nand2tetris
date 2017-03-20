@@ -68,7 +68,7 @@ class SymbolTable:
     type = ""
     entry = self.findEntry(name)
     if entry != []:
-      type = entry[1]
+      type = entry[0]
     return type
     
   # Returns the index assigned to the named identifier

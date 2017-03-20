@@ -416,18 +416,37 @@ class CompilationEngine:
     
   # Compiles a do statement
   def compileDo(self):
+    nbrOfArg = 0
     self.next()
     self.checkIdentifier("doStatement identifier missing")
-    funcName = self.token[1]
-    self.next()
+
+    funcName = self.subroutineTable.TypeOf(self.token[1])    
+    if self.peek()[1] != S_POINT:
+      funcName = self.className
+      self.vmWriter.writePush("pointer", 0)
+      nbrOfArg += 1
+    elif funcName != "":
+      kind = self.subroutineTable.KindOf(self.token[1])
+      idx = self.subroutineTable.IndexOf(self.token[1])
+      self.vmWriter.writePush(kind, idx)
+      nbrOfArg += 1
+      self.next()
+    else:
+      funcName = self.token[1]
+      self.next()
+    
     if self.token[1] == S_POINT:
       self.next()
       self.checkIdentifier("doStatement subroutine identifier missing")
       funcName += "." + self.token[1]
       self.next()
+    else:
+      funcName += "." + self.token[1]
+      self.next()
+    
     self.openBracket("doStatement")
     self.next()
-    nbrOfArg = self.CompileExpressionList()
+    nbrOfArg += self.CompileExpressionList()
     self.closeBracket("doStatement")
     self.next()
     if self.token[1] != S_SEMICOLON:
