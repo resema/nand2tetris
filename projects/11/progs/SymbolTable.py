@@ -86,7 +86,7 @@ class SymbolTable:
     if type == STATIC:
       counter = self.staticCnt
       self.staticCnt += 1
-    elif type == FIELD:
+    elif type == THIS:
       counter = self.fieldCnt
       self.fieldCnt += 1
     elif type == LOCAL:
