@@ -420,14 +420,18 @@ class CompilationEngine:
     self.next()
     self.checkIdentifier("doStatement identifier missing")
 
-    funcName = self.subroutineTable.TypeOf(self.token[1])    
+    funcName = self.subroutineTable.TypeOf(self.token[1])
+    table = self.subroutineTable
+    if funcName == "":
+      funcName = self.classTable.TypeOf(self.token[1])
+      table = self.classTable
     if self.peek()[1] != S_POINT:
       funcName = self.className
       self.vmWriter.writePush("pointer", 0)
       nbrOfArg += 1
     elif funcName != "":
-      kind = self.subroutineTable.KindOf(self.token[1])
-      idx = self.subroutineTable.IndexOf(self.token[1])
+      kind = table.KindOf(self.token[1])
+      idx = table.IndexOf(self.token[1])
       self.vmWriter.writePush(kind, idx)
       nbrOfArg += 1
       self.next()
