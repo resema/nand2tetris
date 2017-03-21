@@ -31,7 +31,7 @@ class VMWriter:
     if command == S_STAR:
       self.fobj_out.write("call Math.multiply 2" + "\n")
     elif command == S_SLASH:
-      self.obj_out.write("call Math.divide 2" + "\n")
+      self.fobj_out.write("call Math.divide 2" + "\n")
     elif command == S_PLUS:
       self.fobj_out.write("add" + "\n")
     elif command == S_MINUS:

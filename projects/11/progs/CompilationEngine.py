@@ -145,10 +145,12 @@ class CompilationEngine:
   #   Any other token is not part of this term
   def CompileTerm(self):
     next = self.peek()
-    if self.token[0] == T_INT_CONST or self.token[0] == T_STRING_CONST:
+    if self.token[0] == T_INT_CONST:
       kind = "constant"
       idx = self.token[1]
       self.vmWriter.writePush(kind, idx)
+    elif self.token[0] == T_STRING_CONST:
+      print(len(self.token[1]))
     elif self.token[1] == K_TRUE: 
       kind = "constant"
       self.vmWriter.writePush(kind, 0)
@@ -167,9 +169,18 @@ class CompilationEngine:
     elif self.token[0] == T_IDENTIFIER:
       funcName = self.token[1]
       if next[1] == S_OANGLEBRACKETS:   # array
+        kind = self.subroutineTable.KindOf(self.token[1])   # root address of array
+        idx = self.subroutineTable.IndexOf(self.token[1])
+        if kind == -1:
+          kind = self.classTable.KindOf(self.token[1])
+          idx = self.classTable.IndexOf(self.token[1])
         self.next()
         self.next()
         self.CompileExpression()      # expression
+        self.vmWriter.writePush(kind, idx)                  # root address of array
+        self.vmWriter.writeArithmetic(S_PLUS)
+        self.vmWriter.writePop("pointer", 1)
+        self.vmWriter.writePush(THAT, 0)
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
       elif next[1] == S_POINT:          # subroutine call
@@ -319,14 +330,24 @@ class CompilationEngine:
   
   # Compiles a let statement
   def compileLet(self):
+    that = False
     self.next()
     self.checkIdentifier("letStatement identifier missing")
     varName = self.token[1]
     self.next()    
     if self.token[0] == T_SYMBOL:
       if self.token[1] == S_OANGLEBRACKETS:
+        kind = self.subroutineTable.KindOf(varName)         # root address of array
+        idx = self.subroutineTable.IndexOf(varName)
+        if kind == -1:
+          kind = self.classTable.KindOf(varName)
+          idx = self.classTable.IndexOf(varName)
         self.next()
         self.CompileExpression()    # expression
+        self.vmWriter.writePush(kind, idx)                  # root address of array
+        self.vmWriter.writeArithmetic(S_PLUS)
+        self.vmWriter.writePop("pointer", 1)
+        that = True
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
         self.next()
@@ -341,7 +362,10 @@ class CompilationEngine:
     if kind == -1:
       kind = self.classTable.KindOf(varName)
       idx = self.classTable.IndexOf(varName)
-    self.vmWriter.writePop(kind, idx)
+    if that == True:
+      self.vmWriter.writePop(THAT, 0)
+    else:
+      self.vmWriter.writePop(kind, idx)
     
   # Compiles an if statement
   def compileIf(self):
