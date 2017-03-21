@@ -150,7 +150,12 @@ class CompilationEngine:
       idx = self.token[1]
       self.vmWriter.writePush(kind, idx)
     elif self.token[0] == T_STRING_CONST:
-      print(len(self.token[1]))
+        strSize = len(self.token[1])           # size of string
+        self.vmWriter.writePush(CONST, strSize)
+        self.vmWriter.writeCall("String.new", 1)       
+        for letter in self.token[1]:
+          self.vmWriter.writePush(CONST, ord(letter))
+          self.vmWriter.writeCall("String.appendChar", 2)          
     elif self.token[1] == K_TRUE: 
       kind = "constant"
       self.vmWriter.writePush(kind, 0)
