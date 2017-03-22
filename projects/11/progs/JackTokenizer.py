@@ -27,14 +27,16 @@ class JackTokenizer:
     self.token = ""
     self.next = ""
     self.type = -1
-    
+        
     for line in self.fobj_in:
       newline = re.sub("\s*//.*?\n", "", line) # remove comments
-      newline = re.sub("\s*/\*.*?\n", "", newline) # remove special comments
+      newline = re.sub("\s*/\*.*?\*/\n", "", newline) # remove special comments single lines
       newline = re.sub("\s*\n", "", newline) # remove empty lines
       newline = re.sub("^\s*", "", newline) # remove spaces at the beginning
       if newline != "":
         self.rawlines.insert(len(self.rawlines), newline)
+    for r in self.rawlines:
+      print(r)
          
   # tokenizes the input file
   def tokenize(self):

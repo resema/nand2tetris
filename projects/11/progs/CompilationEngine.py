@@ -60,10 +60,12 @@ class CompilationEngine:
     #TODO Testing
     self.classTable.printTable("Class Symbol Table")
     
-  # Compiles a static variable declaration of a field declaration
+  # Compiles a static variable declaration or a field declaration
   def CompileClassVarDec(self):
     if self.token[1] == K_FIELD:
       kind = K_THIS
+    elif self.token[1] == K_STATIC:
+      kind = K_STATIC
     else:
       kind = self.token[1]    
     self.next()   
