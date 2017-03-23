@@ -60,7 +60,7 @@ class SymbolTable:
     kind = -1
     entry = self.findEntry(name)
     if entry != []:
-      kind =  entry[1]
+      kind = entry[1]
     return kind
     
   # Returns the type of the named identifier

@@ -174,6 +174,7 @@ class CompilationEngine:
         idx = self.classTable.IndexOf(self.token[1])
       self.vmWriter.writePush(kind, idx)
     elif self.token[0] == T_IDENTIFIER:
+      nbrOfArg = 0
       funcName = self.token[1]
       if next[1] == S_OANGLEBRACKETS:   # array
         kind = self.subroutineTable.KindOf(self.token[1])   # root address of array
@@ -191,15 +192,21 @@ class CompilationEngine:
         if self.token[1] != S_CANGLEBRACKETS:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
       elif next[1] == S_POINT:          # subroutine call
+        type = self.subroutineTable.TypeOf(self.token[1])   # check if object or raw identifier
+        if type == "":
+          type = self.classTable.TypeOf(self.token[1])
         self.next()
         self.next()
         if self.token[0] != T_IDENTIFIER:
           raise Exception("function identifier missing: " + self.token[1])
+        if type != "":
+          funcName = type
+          nbrOfArg += 1
         funcName += "." + self.token[1]
         self.next()
         self.openBracket("term")
         self.next()
-        nbrOfArg = self.CompileExpressionList()
+        nbrOfArg += self.CompileExpressionList()
         self.closeBracket("term")
         self.vmWriter.writeCall(funcName, nbrOfArg)
       else:
