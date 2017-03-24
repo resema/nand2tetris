@@ -162,10 +162,10 @@ class CompilationEngine:
       kind = "constant"
       self.vmWriter.writePush(kind, 0)
       self.vmWriter.writeArithmetic(S_NOT)
-    elif self.token[1] == K_FALSE:
+    elif self.token[1] == K_FALSE or self.token[1] == K_NULL:
       kind = "constant"
       self.vmWriter.writePush(kind, 0)
-    elif self.token[1] == K_THIS or self.token[1] == K_NULL:
+    elif self.token[1] == K_THIS:
       #TODO adapt to specific case
       kind = self.subroutineTable.KindOf(self.token[1])
       idx = self.subroutineTable.IndexOf(self.token[1])
