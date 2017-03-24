@@ -372,6 +372,9 @@ class CompilationEngine:
     if self.token[1] != S_EQUALS:   # equal sign
       raise Exception("letStatement equal symbol missing: " + self.token[1])
     self.next()
+    if that == True:
+      self.vmWriter.writePush("pointer", 1)
+      self.vmWriter.writePop("temp", 0)
     self.CompileExpression()        # expression
     if self.token[1] != S_SEMICOLON:
       raise Exception("letStatement semicolon missing: " + self.token[1])
@@ -381,6 +384,8 @@ class CompilationEngine:
       kind = self.classTable.KindOf(varName)
       idx = self.classTable.IndexOf(varName)
     if that == True:
+      self.vmWriter.writePush("temp", 0)
+      self.vmWriter.writePop("pointer", 1)
       self.vmWriter.writePop(THAT, 0)
     else:
       self.vmWriter.writePop(kind, idx)
