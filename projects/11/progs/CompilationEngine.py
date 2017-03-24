@@ -193,14 +193,19 @@ class CompilationEngine:
           raise Exception("letStatement closing angle bracket missing: " + self.token[1])
       elif next[1] == S_POINT:          # subroutine call
         type = self.subroutineTable.TypeOf(self.token[1])   # check if object or raw identifier
+        kind = self.subroutineTable.KindOf(self.token[1])
+        idx = self.subroutineTable.IndexOf(self.token[1])
         if type == "":
           type = self.classTable.TypeOf(self.token[1])
+          kind = self.classTable.KindOf(self.token[1])
+          idx = self.classTable.IndexOf(self.token[1])
         self.next()
         self.next()
         if self.token[0] != T_IDENTIFIER:
           raise Exception("function identifier missing: " + self.token[1])
         if type != "":
           funcName = type
+          self.vmWriter.writePush(kind, idx)
           nbrOfArg += 1
         funcName += "." + self.token[1]
         self.next()
@@ -242,7 +247,6 @@ class CompilationEngine:
       self.CompileExpression()
       nbrOfArg += 1
     while (self.token[1] == S_KOMMA):
-      # self.tagAsXml(self.token)
       self.next()
       self.CompileExpression()
       nbrOfArg += 1
