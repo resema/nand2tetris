@@ -8,9 +8,14 @@
  * Note: Jack compilers implement multiplication and division using OS method calls.
  */
 class Math {
+  
+    static Array twoToThe;    
 
     /** Initializes the library. */
     function void init() {
+      let twoToThe = Array.new(16);
+      
+      return;
     }
 
     /** Returns the absolute value of x. */
@@ -33,11 +38,11 @@ class Math {
       let shiftedX = x;
       let i = 0;
       
-      while (i < w-1) {           // w, the number of bits required to represent N
-        if (y[ith] == 1) {        // i'th bit of y
-          sum = sum + shiftedX;
+      while (i < 16) {           // w, the number of bits required to represent N
+        if (Math.bit(y, i)) {        // i'th bit of y
+          let sum = sum + shiftedX;
         }
-        shiftedX = shiftedX * 2;
+        let shiftedX = shiftedX * 2;
         let i = i + 1;
       }
       return sum;
@@ -53,24 +58,36 @@ class Math {
       if (y > x) {
         return 0;
       }
-      let q = divide (x, 2*y);
+      let q = Math.divide (x, 2*y);
       if ((x - 2*q*y) < y) {
         return 2*q;
       }
       else {
         return 2*q - 1;
-      }      
+      }    
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
-      var int i, y;
-      let y = 0; 
-      let i = n/2 -1;
+      // var int i, y;
+      // let y = 0; 
+      // let i = n/2 -1;
       
-      while (i > 0) {
-       if (y  
+      // while (i > 0) {
+       // if (y  
+      // }
+      return -1;
+    }
+    
+    function int exp(int b, int e) {
+      var int i, sum;
+      let i = 0;
+      let sum = 1;
+      
+      while (i < (e+1)) {
+        let sum = sum * b;
       }
+      return sum;
     }
 
     /** Returns the greater number. */
@@ -88,4 +105,37 @@ class Math {
       }
       return b;
     }
+
+    //----------------------------------------
+    // Helper functions
+    //----------------------------------------
+    
+    // returns true if the i-th bit of x is 1, false otherwise
+    function boolean bit(int x, int i) {
+      do Math.convertIntToBin(x, 15);
+      if (twoToThe[i] = 1) {
+        return true;
+      }
+      return false;
+    }
+    
+    // convert int to binary, 16 bit
+    function void convertIntToBin(int x, int ith) {      
+      var int twoExpIth;
+      let twoExpIth = Math.exp(2, ith);
+      if (~(twoExpIth > x)) {
+         let twoToThe[ith] = 1;
+         let x = x - twoExpIth;
+      }
+      else {
+        let twoToThe[ith] = 0;
+      }
+      if (~(ith = 0)) {
+        do Math.convertIntToBin(x, ith-1);
+      }
+    }
 }
+
+
+
+
