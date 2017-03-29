@@ -9,12 +9,27 @@
  */
 class Math {
   
-    static Array twoToThe;    
+    static int twoToThe;    
 
     /** Initializes the library. */
     function void init() {
       let twoToThe = Array.new(16);
-      
+      let twoToThe[0] = 1;
+      let twoToThe[1] = 2;
+      let twoToThe[2] = 4;
+      let twoToThe[3] = 8;
+      let twoToThe[4] = 16;
+      let twoToThe[5] = 32;
+      let twoToThe[6] = 64;
+      let twoToThe[7] = 128;
+      let twoToThe[8] = 256;
+      let twoToThe[9] = 512;
+      let twoToThe[10] = 1024;
+      let twoToThe[11] = 2048;
+      let twoToThe[12] = 4096;
+      let twoToThe[13] = 8192;
+      let twoToThe[14] = 16384;
+      let twoToThe[15] = 16384+16384;
       return;
     }
 
@@ -35,6 +50,7 @@ class Math {
       var int i, sum;
       var int shiftedX;
       
+      let sum = 0;
       let shiftedX = x;
       let i = 0;
       
@@ -44,7 +60,7 @@ class Math {
         }
         let shiftedX = shiftedX * 2;
         let i = i + 1;
-      }
+      } 
       return sum;
     }
 
@@ -78,17 +94,6 @@ class Math {
       // }
       return -1;
     }
-    
-    function int exp(int b, int e) {
-      var int i, sum;
-      let i = 0;
-      let sum = 1;
-      
-      while (i < (e+1)) {
-        let sum = sum * b;
-      }
-      return sum;
-    }
 
     /** Returns the greater number. */
     function int max(int a, int b) {
@@ -112,27 +117,7 @@ class Math {
     
     // returns true if the i-th bit of x is 1, false otherwise
     function boolean bit(int x, int i) {
-      do Math.convertIntToBin(x, 15);
-      if (twoToThe[i] = 1) {
-        return true;
-      }
-      return false;
-    }
-    
-    // convert int to binary, 16 bit
-    function void convertIntToBin(int x, int ith) {      
-      var int twoExpIth;
-      let twoExpIth = Math.exp(2, ith);
-      if (~(twoExpIth > x)) {
-         let twoToThe[ith] = 1;
-         let x = x - twoExpIth;
-      }
-      else {
-        let twoToThe[ith] = 0;
-      }
-      if (~(ith = 0)) {
-        do Math.convertIntToBin(x, ith-1);
-      }
+      return ~((x & twoToThe[i]) = 0);
     }
 }
 
