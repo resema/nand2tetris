@@ -19,7 +19,7 @@ class Memory {
       let ram = 0;            // Ram Base Address
       let heap = 2048;        // Heap Base Address
       
-      let freeList = heap;    // First element
+      let freeList = heap;        // head
       let freeList[0] = 0;        // next
       let freeList[1] = 14335     // size
       
@@ -40,7 +40,8 @@ class Memory {
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
-      var int cur, next, segSz, block, addr;
+      var int prev, cur, next, segSz, block, addr;
+      let prev = 0;
       let cur = freeList;
       let next = freeList[0];
       let segSz = freeList[1];
@@ -48,13 +49,28 @@ class Memory {
       
       while (~(cur = 0)) {
         if (~(segSz < block)) {
-          let addr = cur+2;           // prepare current base address for returning
-          let freeList = freeList + block;
+          let addr = cur+2;                   // prepare current base address for returning
           
-          let cur = 0;                // first-fit approach
+          /* check if the fitting element is the head of the list */
+          if (cur = freeList) {               // first element fits
+            let freeList = freeList + block;  // new head
+            if (segSz > block) {
+              let freeList[1] = segSz - block;  //TODO what if first element fits???
+            }
+          }
+          elif (segSz > block) {              // element is bigger
+            let cur[0] = next;
+            let cur[1] = segSz - block;
+          }
+          else {                              // element fits perfect
+            let prev[0] = next;
+          }
+          
+          let cur = 0;                      // first-fit approach
         }
-        else {
-          let cur = next;             // proceed with next element in the list
+        else {                              // proceed with next element in the list
+          let prev = cur;
+          let cur = next;
           let next = cur[0];
           let segSz = cur[1];
         }
