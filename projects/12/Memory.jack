@@ -187,7 +187,12 @@ class Memory {
       }
       
       if (addr = 0) {       // no free block found, which is big enough
-        do Memory.deFrag(freeList);
+        let cur = freeList;
+        
+        while (~(cur[0] = 0)) {
+          do Memory.deFrag(cur);
+          let cur[0] = cur[1];
+        }
         let addr = alloc(size);
       }
       
@@ -215,15 +220,23 @@ class Memory {
     //-------------------------------------
     // Helper functions
     //-------------------------------------
-    function void deFrag(Array head) {
+    function void deFrag(Array elem) {
       var Array cur;
-      let cur = head;
-      let cur[0] = head[0];
-      let cur[1] = head[1];
+      var int addr;
+      let addr = elem + elem[1] + 2;      // elem attach point
+      let cur = freeList;
+      let cur[0] = freeList[0];           // next
+      let cur[1] = freeList[1];           // size
       
-      while (~(cur[0] = 0)) {       // iterate through the list
-        
+      while (~(cur[0] = 0)) {         // iterate through the list
+        if (cur[0] = addr + 1) {
+          let elem[1] = elem[1] + cur[1] + 2;
+          let addr = addr + cur[1] + 2;
+        }
+        let cur = cur[1];             // next element
       }
+      
+      let cur[0] = elem;              // attach elem at the end of freeList
       return;
     }
 }
