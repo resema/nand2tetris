@@ -13,6 +13,7 @@ class Memory {
     static Array ram;
     static Array heap;
     static Array freeList;
+    static Array NOWORD;
     static int LENGTH;
     static int NEXT;
     
@@ -26,6 +27,7 @@ class Memory {
       let freeList = heap;        // head
       let freeList[NEXT] = 0;        // next
       let freeList[LENGTH] = 14335;     // size
+      let NOWORD = 16383;
       
       return;
     }
@@ -44,47 +46,67 @@ class Memory {
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
-      var Array prev, cur, next;
-      var int segSz, blockSz, addr;
-      let prev = 0;
-      let cur = freeList;
-      let next = freeList[NEXT];
-      let segSz = freeList[LENGTH];
-      let blockSz = size+2;
-      let addr = 0;
+      var Array prevWord, foundWord;
+      var int blockSz;
       
-      while (~(cur = 0)) {
-        if (~(segSz < blockSz)) {
-          let addr = cur+2;                   // prepare current base address for returning
-          
-          /* check if the fitting element is the head of the list */
-          if (cur = freeList) {                         // first element fits
-            if (segSz > blockSz) {
-              let freeList = freeList + blockSz;        // new head
-              let freeList[LENGTH] = segSz - blockSz;   
-            }
-            else {  /* first element fits */
-              let freeList = next;
-            }
+      let blockSz = size+2;
+      let prevWord = Memory.findPrevBestFit(size);
+      if (prevWord = NOWORD) {
+        let foundWord = null;
+      }
+      else {
+        if (prevWord = 0) {     // word is at the head of the freeList
+          let foundWord = freeList;
+          if (segSz > blockSz) {
+            let freeList = freeList + blockSz;        // new head
+            let freeList[LENGTH] = segSz - blockSz;   
           }
-          else {    /* not head element of the freeList */
-            if (segSz > blockSz) {              // element is bigger
-              let cur[NEXT] = next;
-              let cur[LENGTH] = segSz - blockSz;
-            }
-            else {                              // element fits perfect
-              let prev[NEXT] = next;            // assign previous elements next pointer to next elem
-            }     
+          else {  /* first element fits in size */
+            let freeList = next;
           }
-          let cur = 0;                      // first-fit approach
-        }
-        else {                              // proceed with next element in the list
-          let prev = cur;
-          let cur = next;
-          let next = cur[NEXT];
-          let segSz = cur[LENGTH];
         }
       }
+      // var Array prev, cur, next;
+      // var int segSz, blockSz, addr;
+      // let prev = 0;
+      // let cur = freeList;
+      // let next = freeList[NEXT];
+      // let segSz = freeList[LENGTH];
+      // let blockSz = size+2;
+      // let addr = 0;
+      
+      // while (~(cur = 0)) {
+        // if (~(segSz < blockSz)) {
+          // let addr = cur+2;                   // prepare current base address for returning
+          
+          // /* check if the fitting element is the head of the list */
+          // if (cur = freeList) {                         // first element fits
+            // if (segSz > blockSz) {
+              // let freeList = freeList + blockSz;        // new head
+              // let freeList[LENGTH] = segSz - blockSz;   
+            // }
+            // else {  /* first element fits in size */
+              // let freeList = next;
+            // }
+          // }
+          // else {    /* not head element of the freeList */
+            // if (segSz > blockSz) {              // element is bigger
+              // let cur[NEXT] = next;
+              // let cur[LENGTH] = segSz - blockSz;
+            // }
+            // else {                              // element fits perfect
+              // let prev[NEXT] = next;            // assign previous elements next pointer to next elem
+            // }     
+          // }
+          // let cur = 0;                      // first-fit approach
+        // }
+        // else {                              // proceed with next element in the list
+          // let prev = cur;
+          // let cur = next;
+          // let next = cur[NEXT];
+          // let segSz = cur[LENGTH];
+        // }
+      // }
       
       if (addr = 0) {       // no free block found, which is big enough
         // do Memory.deFrag(freeList);
@@ -94,6 +116,26 @@ class Memory {
       return addr;
     }
 
+    /** Find word previous to best fit word */
+    function Array findPrevBestFit(int size) {
+      var Array prevBestWord, prevWord, curWord;
+      var int bestSize, curSize;
+      let prevBestWord = NOWORD;
+      let bestSize = 16383-2048;
+      let curWord = freeList;
+      
+      while (~(curWord = 0)) {
+        let curSize = curWord[LENGTH];
+        if (~(curSize < size) & (curSize < bestSize)) {     // found new better word
+          let prevBestWord = prevWord;
+          let bestSize = curSize;
+        }
+        let prevWord = curWord;
+        let curWord = curWord[NEXT];
+      }
+      return prevBestWord;
+    }
+    
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {    
