@@ -13,122 +13,19 @@ class Memory {
     static Array ram;
     static Array heap;
     static Array freeList;
-
-    /** Initializes the class. */
-    function void init() {
-      let ram = 0;            // Ram Base Address
-      let heap = 2048;        // Heap Base Address
-      
-      let freeList = heap;        // head
-      let freeList[0] = 0;        // next
-      let freeList[1] = 14335;     // size
-      
-      return;
-    }
-
-    /** Returns the RAM value at the given address. */
-    function int peek(int address) {
-      return ram[address];
-    }
-
-    /** Sets the RAM value at the given address to the given value. */
-    function void poke(int address, int value) {
-      let ram[address] = value;
-      return;
-    }
-
-    /** Finds an available RAM block of the given size and returns
-     *  a reference to its base address. */
-    function int alloc(int size) {
-      var Array prev, cur, next;
-      var int segSz, blockSz, addr;
-      let prev = 0;
-      let cur = freeList;
-      let next = freeList[0];
-      let segSz = freeList[1];
-      let blockSz = size+2;
-      
-      while (~(cur = 0)) {
-        if (~(segSz < blockSz)) {
-          let addr = cur+2;                   // prepare current base address for returning
-          
-          /* check if the fitting element is the head of the list */
-          if (cur = freeList) {               // first element fits
-            let freeList = freeList + blockSz;  // new head
-            if (segSz > blockSz) {
-              let freeList[1] = segSz - blockSz;  //TODO what if first element fits???
-            }
-          }
-          else {
-            if (segSz > blockSz) {              // element is bigger
-              let cur[0] = next;
-              let cur[1] = segSz - blockSz;
-            }
-            else {                              // element fits perfect
-              let prev[0] = next;
-            }     
-          }
-          let cur = 0;                      // first-fit approach
-        }
-        else {                              // proceed with next element in the list
-          let prev = cur;
-          let cur = next;
-          let next = cur[0];
-          let segSz = cur[1];
-        }
-      }
-      return addr;
-    }
-
-    /** De-allocates the given object (cast as an array) by making
-     *  it available for future allocations. */
-    function void deAlloc(Array o) {    
-      var Array objAddr, cur;
-      var int objNext, objSz;
-      let cur = freeList;
-      let objAddr = o-2;
-      
-      while (~(cur[0] = 0)) {
-        let cur = cur[0];
-      }
-      
-      // Attach free block at the end of freeList
-      let cur[0] = objAddr;
-      let objAddr[0] = 0;
-      return;
-    }    
+    static int LENGTH;
+    static int NEXT;
     
-    //-------------------------------------
-    // Helper functions
-    //-------------------------------------
-    function void deFragment() {
-      return;
-    }
-}
-// This file is part of www.nand2tetris.org
-// and the book "The Elements of Computing Systems"
-// by Nisan and Schocken, MIT Press.
-// File name: projects/12/Memory.jack
-
-/**
- * This library provides two services: direct access to the computer's main
- * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
- * consists of 32,768 words, each holding a 16-bit binary number.
- */ 
-class Memory {
-  
-    static Array ram;
-    static Array heap;
-    static Array freeList;
-
     /** Initializes the class. */
     function void init() {
       let ram = 0;            // Ram Base Address
       let heap = 2048;        // Heap Base Address
+      let NEXT = 0;
+      let LENGTH = 1;
       
       let freeList = heap;        // head
-      let freeList[0] = 0;        // next
-      let freeList[1] = 14335;     // size
+      let freeList[NEXT] = 0;        // next
+      let freeList[LENGTH] = 14335;     // size
       
       return;
     }
@@ -151,8 +48,8 @@ class Memory {
       var int segSz, blockSz, addr;
       let prev = 0;
       let cur = freeList;
-      let next = freeList[0];
-      let segSz = freeList[1];
+      let next = freeList[NEXT];
+      let segSz = freeList[LENGTH];
       let blockSz = size+2;
       let addr = 0;
       
@@ -164,16 +61,16 @@ class Memory {
           if (cur = freeList) {               // first element fits
             let freeList = freeList + blockSz;  // new head
             if (segSz > blockSz) {
-              let freeList[1] = segSz - blockSz;  //TODO what if first element fits???
+              let freeList[LENGTH] = segSz - blockSz;  //TODO what if first element fits???
             }
           }
           else {
             if (segSz > blockSz) {              // element is bigger
-              let cur[0] = next;
-              let cur[1] = segSz - blockSz;
+              let cur[NEXT] = next;
+              let cur[LENGTH] = segSz - blockSz;
             }
             else {                              // element fits perfect
-              let prev[0] = next;
+              let prev[NEXT] = next;
             }     
           }
           let cur = 0;                      // first-fit approach
@@ -181,19 +78,14 @@ class Memory {
         else {                              // proceed with next element in the list
           let prev = cur;
           let cur = next;
-          let next = cur[0];
-          let segSz = cur[1];
+          let next = cur[NEXT];
+          let segSz = cur[LENGTH];
         }
       }
       
       if (addr = 0) {       // no free block found, which is big enough
-        let cur = freeList;
-        
-        while (~(cur[0] = 0)) {
-          do Memory.deFrag(cur);
-          let cur[0] = cur[1];
-        }
-        let addr = alloc(size);
+        // do Memory.deFrag(freeList);
+        // let addr = alloc(size);
       }
       
       return addr;
@@ -207,36 +99,38 @@ class Memory {
       let cur = freeList;
       let objAddr = o-2;
       
-      while (~(cur[0] = 0)) {
-        let cur = cur[0];
+      while (~(cur[NEXT] = 0)) {
+        let cur = cur[NEXT];
       }
       
       // Attach free block at the end of freeList
-      let cur[0] = objAddr;
-      let objAddr[0] = 0;
+      let cur[NEXT] = objAddr;
+      let objAddr[NEXT] = 0;
       return;
     }    
     
     //-------------------------------------
     // Helper functions
     //-------------------------------------
+    /** Re-arrange freeList memory to create bigger free space
+     *   TODO: should probably receive sorted elements. */
     function void deFrag(Array elem) {
       var Array cur;
       var int addr;
-      let addr = elem + elem[1] + 2;      // elem attach point
+      let addr = elem + elem[LENGTH] + 2;   // elem attach point
       let cur = freeList;
-      let cur[0] = freeList[0];           // next
-      let cur[1] = freeList[1];           // size
+      let cur[NEXT] = freeList[NEXT];       // next
+      let cur[LENGTH] = freeList[LENGTH];   // size
       
-      while (~(cur[0] = 0)) {         // iterate through the list
-        if (cur[0] = addr + 1) {
-          let elem[1] = elem[1] + cur[1] + 2;
-          let addr = addr + cur[1] + 2;
+      while (~(cur[NEXT] = 0)) {            // iterate through the list
+        if (cur[NEXT] = addr + 1) {
+          let elem[LENGTH] = elem[LENGTH] + cur[LENGTH] + 2;
+          let addr = addr + cur[LENGTH] + 2;
         }
-        let cur = cur[1];             // next element
+        let cur = cur[LENGTH];              // next element
       }
       
-      let cur[0] = elem;              // attach elem at the end of freeList
-      return;
+      let cur[NEXT] = elem;                 // attach elem at the end of freeList
+      return; 
     }
 }
