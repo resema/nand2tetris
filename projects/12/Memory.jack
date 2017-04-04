@@ -58,19 +58,22 @@ class Memory {
           let addr = cur+2;                   // prepare current base address for returning
           
           /* check if the fitting element is the head of the list */
-          if (cur = freeList) {               // first element fits
-            let freeList = freeList + blockSz;  // new head
+          if (cur = freeList) {                         // first element fits
             if (segSz > blockSz) {
-              let freeList[LENGTH] = segSz - blockSz;  //TODO what if first element fits???
+              let freeList = freeList + blockSz;        // new head
+              let freeList[LENGTH] = segSz - blockSz;   
+            }
+            else {  /* first element fits */
+              let freeList = next;
             }
           }
-          else {
+          else {    /* not head element of the freeList */
             if (segSz > blockSz) {              // element is bigger
               let cur[NEXT] = next;
               let cur[LENGTH] = segSz - blockSz;
             }
             else {                              // element fits perfect
-              let prev[NEXT] = next;
+              let prev[NEXT] = next;            // assign previous elements next pointer to next elem
             }     
           }
           let cur = 0;                      // first-fit approach
