@@ -10,9 +10,12 @@
  * the screen is indexed (0,0).
  */
 class Screen {
+  
+    static Array SCREEN;
 
     /** Initializes the Screen. */
     function void init() {
+      let SCREEN = 16384;
     }
 
     /** Erases the entire screen. */
@@ -26,6 +29,9 @@ class Screen {
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
+      var int address, value;
+      let address = *y+x/16;
+      let value = Memory.peek(SCREEN + address);
     }
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
@@ -40,4 +46,41 @@ class Screen {
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
     }
+    
+    //----------------------------
+    // Helper functions
+    //----------------------------
+    function int mod(int num, int den) {
+      var int rest, negNum, negDen;
+      let rest = 0;
+      let negNum = 1;
+      let negDen = 1;
+      
+      if (num < 0) {
+        let negNum = -1;
+        let num = Math.abs(num);
+      }
+      if (den < 0) {
+        let negDen = -1;
+        let den = Math.abs(den);
+      }
+      
+      while (num > 0) {
+        if (num < den) {
+          let rest = num;
+        }
+        let num = num - den;
+      }
+      return rest * negNum * negDen;
+    }
 }
+
+
+
+
+
+
+
+
+
+
