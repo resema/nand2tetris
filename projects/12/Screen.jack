@@ -12,6 +12,7 @@
 class Screen {
   
     static Array SCREEN;
+    static bool isBlack;
 
     /** Initializes the Screen. */
     function void init() {
@@ -21,12 +22,22 @@ class Screen {
 
     /** Erases the entire screen. */
     function void clearScreen() {
+      var int addr, lastAddr;
+      let addr = 0;
+      let lastAddr = SCREEN + 8192;
+      
+      while (addr < lastAddr) {
+        do Memory.poke(addr, 0);
+        let addr = addr + 1;
+      }
+      
       return;
     }
 
     /** Sets the current color, to be used for all subsequent drawXXX commands.
      *  Black is represented by true, white by false. */
     function void setColor(boolean b) {
+      let isBlack = b;
       return;
     }
 
@@ -40,7 +51,13 @@ class Screen {
       let bit = Math.mod(x, 16);
       let mask = Math.getTwoToThe(bit);
       
-      do Memory.poke(SCREEN + address, value | mask);
+      if (isBlack = true) {
+        let mask = value | mask;
+      }
+      else {
+        let mask = value & masK
+      }
+      do Memory.poke(SCREEN + address, mask);
       return;
     }
 
