@@ -17,6 +17,7 @@ class Screen {
     /** Initializes the Screen. */
     function void init() {
       let SCREEN = 16384;
+      do Screen.setColor(true);
       return;
     }
 
@@ -55,7 +56,7 @@ class Screen {
         let mask = value | mask;
       }
       else {
-        let mask = value & masK
+        let mask = value & mask;
       }
       do Memory.poke(SCREEN + address, mask);
       return;
@@ -63,12 +64,52 @@ class Screen {
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
+      if (y1 = y2) {
+        do Screen.drawHorizontalLine(x1, x2, y1);
+      }
+      if (x1 = x2) {
+        do Screen.drawVerticalLine(x1, y1, y2);
+      }
+      return;
+    }
+    
+    /** Draws horizontal lines */
+    function void drawHorizontalLine(int x1, int x2, int y) {
+      var int it, end;
+      let it = x1;
+      let end = x2;
+      
+      while (it < end) {
+        do Screen.drawPixel(it, y);
+        let it = it+1;
+      }
       return;
     }
 
+    /** Draws verticallines */
+    function void drawVerticalLine(int x, int y1, int y2) {
+      var int it, end;
+      let it = y1;
+      let end = y2;
+      
+      while (it < end) {
+        do Screen.drawPixel(x, it);
+        let it = it+1;
+      }return;
+    }    
+    
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+      var int it, end;
+      let it = y1;
+      let end = y2;
+     
+      while (it < end) {
+        do Screen.drawHorizontalLine(x1, x2, it);
+        let it = it+1;
+      }
+      
       return;
     }
 
