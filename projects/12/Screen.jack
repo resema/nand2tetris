@@ -24,7 +24,7 @@ class Screen {
     /** Erases the entire screen. */
     function void clearScreen() {
       var int addr, lastAddr;
-      let addr = 0;
+      let addr = SCREEN;
       let lastAddr = SCREEN + 8192;
       
       while (addr < lastAddr) {
@@ -181,6 +181,14 @@ class Screen {
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
+      var int ity;
+      let ity = -r;
+      
+      while (ity < r) {
+        do Screen.drawLine((x-Math.sqrt((r*r)-(ity*ity))), (y+ity), (x+Math.sqrt((r*r)-(ity*ity))), (y+ity));
+        let ity = ity + 1;
+      }
+      
       return;
     }
 }
