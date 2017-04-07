@@ -56,7 +56,7 @@ class Screen {
         let mask = value | mask;
       }
       else {
-        let mask = value & mask;
+        let mask = value & (~mask);
       }
       do Memory.poke(SCREEN + address, mask);
       return;
@@ -64,11 +64,29 @@ class Screen {
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
-      if (y1 = y2) {
+      if ((y1 = y2) & (x2 > x1)) {
         do Screen.drawHorizontalLine(x1, x2, y1);
       }
-      if (x1 = x2) {
+      if ((y1 = y2) & (x2 < x1)) {
+        do Screen.drawHorizontalLine(x2, x1, y1);
+      }
+      if ((x1 = x2) & (y2 > y1)) {
         do Screen.drawVerticalLine(x1, y1, y2);
+      }
+      if ((x1 = x2) & (y2 < y1)) {
+        do Screen.drawVerticalLine(x1, y2, y1);
+      }
+      if ((y2 > y1) & (x2 > x1)) { /* top left to bottom right */
+        do Screen.drawTopLeftToBttmRightLine(x1, y1, x2, y2);
+      }
+      if ((y2 < y1) & (x2 > x1)) { /* bottom left to top right */
+        do Screen.drawBttmLeftToTopRightLine(x1, y1, x2, y2);
+      }
+      if ((y2 > y1) & (x2 < x1)) { /* bottom right to top left */
+        do Screen.drawBttmLeftToTopRightLine(x2, y2, x1, y1);
+      }
+      if ((y2 < y1) & (x2 < x1)) { /* top right to bottom left */
+        do Screen.drawTopLeftToBttmRightLine(x2, y2, x1, y1);
       }
       return;
     }
@@ -86,6 +104,54 @@ class Screen {
       return;
     }
 
+    /** Draws diagonal lines */
+    function void drawTopLeftToBttmRightLine(int x1, int y1, int x2, int y2) {
+      var int itx, ity, dx, dy, diff;
+      let itx = 0;
+      let ity = 0;
+      let dx = x2 - x1;
+      let dy = y2 - y1;
+      let diff = 0;
+      
+      while((~(itx > dx)) & (~(ity > dy))) {
+        do Screen.drawPixel((x1+itx), y1+ity);
+        if (diff < 0) {
+          let itx = itx + 1;
+          let diff = diff + dy;
+        }
+        else {
+          let ity = ity + 1;
+          let diff = diff - dx;
+        }
+      }
+      
+      return;
+    }
+    
+    /** Draws bottom left to top right lines */
+    function void drawBttmLeftToTopRightLine(int x1, int y1, int x2, int y2) {
+      var int itx, ity, dx, dy, diff;
+      let itx = 0;
+      let ity = 0;
+      let dx = x2 - x1;
+      let dy = y2 - y1;
+      let diff = 0;
+      
+      while((~(itx > dx)) & (~(ity < dy))) {
+        do Screen.drawPixel((x1+itx), y1+ity);
+        if (diff > 0) {
+          let itx = itx + 1;
+          let diff = diff + dy;
+        }
+        else {
+          let ity = ity - 1;
+          let diff = diff + dx;
+        }
+      }
+      
+      return;
+    }
+    
     /** Draws verticallines */
     function void drawVerticalLine(int x, int y1, int y2) {
       var int it, end;
