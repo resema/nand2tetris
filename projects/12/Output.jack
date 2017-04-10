@@ -19,8 +19,12 @@ class Output {
     // Character map for displaying characters
     static int MAXROW;
     static int MAXCOL;
-
+    static int ROWSZ;
+    static int COLSZ;
+    
+    static Array SCREEN; 
     static Array charMaps; 
+    
     static int cursorRow;
     static int cursorCol;
     
@@ -29,11 +33,17 @@ class Output {
     function void init() {
       let MAXROW = 23;
       let MAXCOL = 64;
+      let ROWSZ = 11;
+      let COLSZ = 7;
+      
+      let SCREEN = 16384;
 
       let cursorRow = 0;
       let cursorCol = 0;
 
       do Output.initMap();
+      
+      return;
     }
 
     // Initializes the character map array
@@ -112,7 +122,7 @@ class Output {
         do Output.create(90,63,51,49,24,12,6,35,51,63,0,0);  // Z
 
         do Output.create(91,30,6,6,6,6,6,6,6,30,0,0);          // [
-        do Output.create(92,0,0,1,3,6,12,24,48,32,0,0);        // \
+        do Output.create(92,0,0,1,3,6,12,24,48,32,0,0);        // \ 
         do Output.create(93,30,24,24,24,24,24,24,24,30,0,0);   // ]
         do Output.create(94,8,28,54,0,0,0,0,0,0,0,0);          // ^
         do Output.create(95,0,0,0,0,0,0,0,0,0,63,0);           // _
@@ -150,7 +160,7 @@ class Output {
         do Output.create(125,7,12,12,12,56,12,12,12,7,0,0);    // }
         do Output.create(126,38,45,25,0,0,0,0,0,0,0,0);        // ~
 
-	return;
+        return;
     }
 
     // Creates the character map array of the given character index, using the given values.
@@ -189,30 +199,55 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
-      let cursorCol = i * 7;
-      let cursorRow = j * 11;
+      let cursorCol = i * COLSZ;
+      let cursorRow = j * ROWSZ;
+      return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+      var Array map;
+      var int addr, value, x, y, ity, endy;
+      
+      let map = Output.getMap(c);
+      let ity = 0;
+      let x = cursorCol;
+      let y = cursorRow;
+      let endy = ROWSZ;
+      
+      while (ity < endy) {
+        let addr = SCREEN + (32*y)+(x/16);
+        let value = map[ity];
+        do Memory.poke(addr, value);
+        
+        let ity = ity+1;
+        let y = y + 1;
+      }
+      
+      return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+      return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+      return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+      return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+      let cursorCol = cursorCol - COLSZ;
+      return;
     }
 }
