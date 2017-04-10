@@ -34,7 +34,7 @@ class Output {
       let MAXROW = 23;
       let MAXCOL = 64;
       let ROWSZ = 11;
-      let COLSZ = 7;
+      let COLSZ = 8;
       
       let SCREEN = 16384;
 
@@ -199,7 +199,7 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
-      let cursorCol = i * COLSZ;
+      let cursorCol = i;
       let cursorRow = j * ROWSZ;
       return;
     }
@@ -208,7 +208,7 @@ class Output {
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
       var Array map;
-      var int addr, value, x, y, ity, endy;
+      var int mask, addr, value, x, y, ity, endy;
       
       let map = Output.getMap(c);
       let ity = 0;
@@ -217,12 +217,25 @@ class Output {
       let endy = ROWSZ;
       
       while (ity < endy) {
-        let addr = SCREEN + (32*y)+(x/16);
+        let addr = SCREEN + (32*y)+(8*x/16);
+        let mask = Memory.peek(addr);
         let value = map[ity];
-        do Memory.poke(addr, value);
+        if (~(Math.mod(x, 2) = 0)) {
+          let value = value * 256;
+        }
+        do Memory.poke(addr, (mask | value));
         
         let ity = ity+1;
         let y = y + 1;
+      }
+      
+      if ((cursorCol + COLSZ) > 450) {
+        let cursorRow = cursorRow + ROWSZ;
+        let cursorCol = 0;
+      }
+      else {
+        let cursorRow = cursorRow;
+        let cursorCol = cursorCol + 1;
       }
       
       return;
