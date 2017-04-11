@@ -31,8 +31,8 @@ class Output {
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
-      let MAXROW = 23;
-      let MAXCOL = 64;
+      let MAXROW = 22;
+      let MAXCOL = 63;
       let ROWSZ = 11;
       let COLSZ = 8;
       
@@ -199,8 +199,8 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
-      let cursorCol = i;
-      let cursorRow = j * ROWSZ;
+      let cursorCol = j;
+      let cursorRow = i;
       return;
     }
 
@@ -216,25 +216,30 @@ class Output {
       let y = cursorRow;
       let endy = ROWSZ;
       
+      let addr = SCREEN + (32*y*11)+(8*x/16);
       while (ity < endy) {
-        let addr = SCREEN + (32*y)+(8*x/16);
-        let mask = Memory.peek(addr);
+        let mask = Memory.peek(addr);     // do not overwrite lower 8 bits
         let value = map[ity];
         if (~(Math.mod(x, 2) = 0)) {
-          let value = value * 256;
+          let value = value * 256;        // write higher 8 bits
         }
         do Memory.poke(addr, (mask | value));
         
         let ity = ity+1;
         let y = y + 1;
+        let addr = addr + 32;   // next line of bitmap
       }
       
-      if ((cursorCol + COLSZ) > 450) {
-        let cursorRow = cursorRow + ROWSZ;
+      if (cursorCol = MAXCOL) {
         let cursorCol = 0;
+        if (cursorRow < MAXROW) {
+          let cursorRow = cursorRow + 1;
+        }
+        else {
+         let cursorRow = 0;
+        }
       }
       else {
-        let cursorRow = cursorRow;
         let cursorCol = cursorCol + 1;
       }
       
