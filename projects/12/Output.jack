@@ -94,7 +94,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,63,51,51,51,51,0,0);          // A ** TO BE FILLED **
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -247,23 +247,54 @@ class Output {
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+      var int len, i, c;
+      let i = 0;
+      let len = s.length();
+      while (i < len) {
+        let c = s.charAt(i);
+        do Output.printChar(c);
+        let i = i+1;
+      }
       return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+      var int num, den, value;
+      let num = 10000;
+      let den = 10;
+            
+      if (i < 0) {
+        do Output.printChar(45);
+        let i = -i;
+      }
+      
+      while (i < num) {
+        let num = num / den;
+      }
+      
+      while (~(num = 0)) {
+        let value = i / num;
+        let i = Math.mod(i, num);        
+        let num = num / den;
+        do Output.printChar(48 + value); 
+      }
+      
       return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+      let cursorCol = 0;
+      let cursorRow = cursorRow + 1;
       return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
-      let cursorCol = cursorCol - COLSZ;
+      let cursorCol = cursorCol-1;
+      do Output.printChar(32);
       return;
     }
 }
