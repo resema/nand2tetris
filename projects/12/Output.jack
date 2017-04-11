@@ -31,7 +31,7 @@ class Output {
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
-      let MAXROW = 22;
+      let MAXROW = 23;
       let MAXCOL = 63;
       let ROWSZ = 11;
       let COLSZ = 8;
@@ -232,11 +232,9 @@ class Output {
       
       if (cursorCol = MAXCOL) {
         let cursorCol = 0;
-        if (cursorRow < MAXROW) {
-          let cursorRow = cursorRow + 1;
-        }
-        else {
-         let cursorRow = 0;
+        let cursorRow = cursorRow + 1;
+        if (cursorRow = MAXROW) {
+          let cursorRow = 0;
         }
       }
       else {
