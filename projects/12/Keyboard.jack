@@ -73,6 +73,7 @@ class Keyboard {
       let input = Keyboard.readChar();
       while (~(input = String.newLine())) {         // new line
         if (input = String.backSpace()) {
+          do Output.backSpace();                    // remove black square
           do Output.backSpace();
           do line.eraseLastChar();  
         }
