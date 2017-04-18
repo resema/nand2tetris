@@ -75,6 +75,26 @@ class String {
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
+      if (val < 0) {
+        let val = -val;
+        do appendChar(45);      // leading '-'
+      }
+      do String.doSetInt(val);
+      
+      return;
+    }
+    
+    /** Helper function for recursion */
+    function void doSetInt(int val) {
+      // val int lastDigit;
+      // val int c;
+      // let lastDigit = Math.mod(val, 10);
+      // let c = lastDigit + 48;
+      
+      // if (~(val < 10)) {
+        // do doSetInt(val/10);
+      // }
+      // do appendChar(c);
       return;
     }
 
@@ -93,3 +113,18 @@ class String {
       return 34;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
