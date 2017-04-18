@@ -79,22 +79,22 @@ class String {
         let val = -val;
         do appendChar(45);      // leading '-'
       }
-      do String.doSetInt(val);
+      do doSetInt(val);
       
       return;
     }
     
     /** Helper function for recursion */
-    function void doSetInt(int val) {
-      // val int lastDigit;
-      // val int c;
-      // let lastDigit = Math.mod(val, 10);
-      // let c = lastDigit + 48;
+    method void doSetInt(int val) {
+      var int lastDigit;
+      var int c;
+      let lastDigit = Math.mod(val, 10);
+      let c = lastDigit + 48;
       
-      // if (~(val < 10)) {
-        // do doSetInt(val/10);
-      // }
-      // do appendChar(c);
+      if (~(val < 10)) {
+        do doSetInt(val/10);
+      }
+      do appendChar(c);
       return;
     }
 
