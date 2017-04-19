@@ -105,9 +105,9 @@ class String {
     /** Helper function for recursion */
     method void doSetInt(int val) {
       var int lastDigit, c, newVal;
-      // let lastDigit = Math.mod(val, 10);
+      let lastDigit = Math.mod(val, 10);
       let newVal = val / 10;
-      let lastDigit = val - (newVal * 10);
+      // let lastDigit = val - (newVal * 10);
       let c = lastDigit + 48;
       
       if (~(val < 10)) {

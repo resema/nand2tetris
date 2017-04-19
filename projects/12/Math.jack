@@ -84,17 +84,33 @@ class Math {
       let x = Math.abs(x);
       let y = Math.abs(y);
       
-      if (y > x) {
+      let result = Math.doDivide(x, y);
+      // if (y > x) {
+        // return 0;
+      // }
+      // let q = Math.divide(x, (y+y));
+      // if ((x - (2*q*y)) < y) {
+        // let result = (q+q);
+      // }
+      // else {
+        // let result = ((q+q) + 1);
+      // }    
+      return (result * negX * negY);
+    }
+    
+    function int doDivide(int x, int y) {
+      var int result, q;
+      if ((y > x) | (y < 0)) {
         return 0;
       }
-      let q = Math.divide(x, (y+y));
+      let q = Math.doDivide(x, (y+y));
       if ((x - (2*q*y)) < y) {
         let result = (q+q);
       }
       else {
         let result = ((q+q) + 1);
-      }    
-      return (result * negX * negY);
+      }   
+      return result;
     }
 
     /** Returns the integer part of the square root of x. */
