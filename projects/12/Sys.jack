@@ -34,11 +34,11 @@ class Sys {
       let msPassed = 0;
       
       while(~(elapsed)) {
-          if (~(duration < msPassed)) {
+          if (duration < msPassed) {
             let elapsed = true;
           }
           do Math.divide(32767,2);
-          let msPassed = msPassed + 1;
+          let msPassed = msPassed + 20;
       }
       return;
     }
