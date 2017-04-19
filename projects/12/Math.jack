@@ -85,16 +85,6 @@ class Math {
       let y = Math.abs(y);
       
       let result = Math.doDivide(x, y);
-      // if (y > x) {
-        // return 0;
-      // }
-      // let q = Math.divide(x, (y+y));
-      // if ((x - (2*q*y)) < y) {
-        // let result = (q+q);
-      // }
-      // else {
-        // let result = ((q+q) + 1);
-      // }    
       return (result * negX * negY);
     }
     
