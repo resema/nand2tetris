@@ -38,7 +38,7 @@ class Sys {
             let elapsed = true;
           }
           do Math.divide(32767,2);
-          let msPassed = msPassed + 100;
+          let msPassed = msPassed + 1;
       }
       return;
     }
